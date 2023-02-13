@@ -343,6 +343,7 @@ class ArticleUpdate(UpdateView):
     model = Articles
     template_name = 'admin/new_article.html'
     success_url = 'articles_list'
+    fields = '__all__'
 
     def get_context_data(self, **kwargs):
         context = super(ArticleUpdate, self).get_context_data(**kwargs)
