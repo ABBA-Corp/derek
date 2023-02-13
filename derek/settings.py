@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions', 'colorfield',
     'django.contrib.messages', 'main', 'corsheaders',
     'django.contrib.staticfiles', 'rest_framework',
-    'ckeditor_uploader', 'easy_thumbnails', 'admins', 'autoslug',
+    'easy_thumbnails', 'admins', 'autoslug',
     'django_cleanup.apps.CleanupConfig',
 ]
 
@@ -170,7 +170,7 @@ REST_FRAMEWORK = {
 
 # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
+    "http://localhost:3000", 'https://derek-ndc.vercel.app'
 ]
 
 
