@@ -344,6 +344,18 @@ class ArticleUpdate(BasedFormView):
     template_name = 'admin/new_article.html'
     success_url = 'articles_list'
 
+    def get_context_data(self, **kwargs):
+        context = super(ArticleUpdate, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+        context['fields'] = get_model_fields(self.model)
+        context['relateds'] = ArticleCategories.objects.order_by('-id')
+
+        context['dropzone_key'] = self.model._meta.verbose_name
+
+
+        return context
+
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
