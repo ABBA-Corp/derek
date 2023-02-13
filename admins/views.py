@@ -339,7 +339,7 @@ def del_article(request):
 # article update
 
 
-class ArticleUpdate(BasedFormView):
+class ArticleUpdate(UpdateView):
     model = Articles
     template_name = 'admin/new_article.html'
     success_url = 'articles_list'
@@ -350,7 +350,6 @@ class ArticleUpdate(BasedFormView):
         context['lang'] = Languages.objects.filter(default=True).first()
         context['fields'] = get_model_fields(self.model)
         context['relateds'] = ArticleCategories.objects.order_by('-id')
-
         context['dropzone_key'] = self.model._meta.verbose_name
 
 
