@@ -241,14 +241,14 @@ class TranslationsSerializerBadVersion(serializers.Serializer):
         languages = Languages.objects.filter(active=True)
         
         for lang in languages:
-            data[lang.code] = []
+            data[lang.code] = {}
             new_data = {}
             for item in instance:
                 val = item.value.get(lang.code, '')
                 key = str(item.key)
                 new_data[key] = val
 
-            data[lang.code].append(new_data)
+            data[lang.code] = new_data
 
         return data
 
