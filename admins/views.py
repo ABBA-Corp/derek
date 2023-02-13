@@ -107,9 +107,6 @@ class BasedFormView(CreateView):
         else:
             return None
 
-
-    def post(self, request, data_dict, *args, **kwargs):
-        return super().post(request, data_dict, *args, **kwargs)
     
 
 
