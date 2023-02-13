@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Products, Category, AtributOptions, Atributs, ProductVariants, Colors
 from rest_framework import generics, views, pagination, filters
-from .serializers import ProductsSerializer, Categoryserializer, ProductVariantSimpleSerializer, ReviewSerializer, ShortApplicationSerializer
+from .serializers import ProductsSerializer, Categoryserializer, ProductVariantSimpleSerializer, ReviewSerializer, ShortApplicationSerializer, TranslationsSerializerBadVersion
 from .serializers import ArticleSerializer, StaticInformationSerializer, TranslationSerializer, LangsSerializer, PartnersSerializer, ProductVariantDetailSerializer
 from admins.models import Articles, StaticInformation, Partners, Reviews, Translations, Languages, ShortApplication
 from rest_framework.response import Response
@@ -46,7 +46,7 @@ class StaticInfView(views.APIView):
 class TranslationsView(views.APIView):
     def get(self, request, fromat=None):
         translations = Translations.objects.all()
-        serializer = TranslationSerializer(translations, context={'request': request})
+        serializer = TranslationsSerializerBadVersion(translations, context={'request': request})
         return Response(serializer.data)
 
 

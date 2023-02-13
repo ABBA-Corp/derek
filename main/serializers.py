@@ -234,6 +234,25 @@ class TranslationSerializer(serializers.Serializer):
         return data
 
 
+# class TransaltionForDostonaka
+class TranslationsSerializerBadVersion(serializers.Serializer): 
+    def to_representation(self, instance):
+        data = {}
+        languages = Languages.objects.filter(active=True)
+        
+        for lang in languages:
+            data[lang.code] = []
+            new_data = {}
+            for item in instance:
+                val = item.value.get(lang.code, '')
+                key = str(item.key)
+                new_data[key] = val
+
+            data[lang.code].append(new_data)
+
+        return data
+
+
 # langs serializer
 class LangsSerializer(serializers.ModelSerializer):
     class Meta:
