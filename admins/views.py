@@ -85,7 +85,7 @@ class BasedFormView(CreateView):
         context['lang'] = Languages.objects.filter(default=True).first()
         context['fields'] = get_model_fields(self.model)
 
-        if self.related_model:
+        if self.related_model is not None:
             context['relateds'] = self.related_model.objects.order_by('-id')
     
         context['dropzone_key'] = self.model._meta.verbose_name
@@ -97,7 +97,7 @@ class BasedFormView(CreateView):
                 context['images'] = list({'name': it['name'], 'id': clean_text(
                     it['name'])} for it in self.request.session[context['dropzone_key']] if it['id'] == '')
 
-            return context
+        return context
 
     def form_valid(self, form):
         return None
