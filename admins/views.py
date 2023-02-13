@@ -84,7 +84,10 @@ class BasedFormView(CreateView):
         context['langs'] = Languages.objects.filter(active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
         context['fields'] = get_model_fields(self.model)
-        context['relateds'] = self.related_model.objects.order_by('-id')
+
+        if self.related_model:
+            context['relateds'] = self.related_model.objects.order_by('-id')
+    
         context['dropzone_key'] = self.model._meta.verbose_name
 
         if self.create:
