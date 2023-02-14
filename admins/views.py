@@ -1533,7 +1533,7 @@ class CategoryCreate(CreateView):
                 pass
 
         key = self.model._meta.verbose_name
-        sess_images = request.session.get(f'{key}_image')
+        sess_images = request.session.get(f'{key}_image', [])
         images = [it for it in sess_images if it['id'] == '']
 
         if sess_images and len(images) > 0:
