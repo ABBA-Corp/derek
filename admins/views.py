@@ -1260,7 +1260,7 @@ class ReviewsCreate(CreateView):
             return render(request, self.template_name, data)
 
         rating = data_dict.get('rating', 0)
-        if type(rating) == float or rating < 0 or rating > 5:
+        if type(rating) == float or int(rating) < 0 or int(rating) > 5:
             data['request_post'] = data_dict
             data['rating_error'] = 'Рейтинг должен быть натуральным числом в интервале от 0 до 5'
             return render(request, self.template_name, data)
@@ -1314,6 +1314,12 @@ class ReviewsUpdate(UpdateView):
         if is_valid_field(data_dict, 'text') == False:
             data['request_post'] = data_dict
             data['text_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
+
+        rating = data_dict.get('rating', 0)
+        if type(rating) == float or int(rating) < 0 or int(rating) > 5:
+            data['request_post'] = data_dict
+            data['rating_error'] = 'Рейтинг должен быть натуральным числом в интервале от 0 до 5'
             return render(request, self.template_name, data)
 
         instance = self.get_object()
