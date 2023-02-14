@@ -6,6 +6,8 @@ from .serializers import ArticleSerializer, StaticInformationSerializer, Transla
 from admins.models import Articles, StaticInformation, Partners, Reviews, Translations, Languages, ShortApplication
 from rest_framework.response import Response
 from admins.utils import list_of_dicts_to_queryset
+from django.db.models import Q
+from .utils import search_func
 # Create your views here.
 
 # pagination
@@ -165,7 +167,29 @@ class ProductsSearch(generics.ListAPIView):
 # search 
 class Search(views.APIView):
     def get(self, request, fromat=None):
-        pass
+        q = request.GET.get("q", '')
+        if q == '':
+            return Response({'error': 'q param is required'})
+        
+        products = ProductVariants.objects.filter(product__active=True).filter(default=True)
+        categories = Category.objects.all()
+        articles = Articles.objects.filter(active=True)
+
+        articles_results = search_func(q, 'title', queryset=articles, fields=['title', 'subtitle', 'slug', 'create_date'], image_fields=['image'], request=request)
+        product_results = search_func(q, 'name', queryset=products, fields=['name', 'slug'], image_fields=['image'], request=request, product=True)
+        cotalog_results = search_func(q, 'name', queryset=categories, fields=['name', 'slug'], image_fields=['image'], request=request)
+
+        res_data = {}
+        res_data['products'] = product_results
+        res_data['categories'] = cotalog_results
+        res_data['articles'] = articles_results
+
+
+        return Response(res_data)
+
+        
+
+            
 
 
 # application add

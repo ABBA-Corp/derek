@@ -1,5 +1,5 @@
 from admins.models import Languages, Translations
-
+from .serializers import BasedModelSerializer
 
 def translator(word: str, lang: str = None):
     if lang:
@@ -16,4 +16,26 @@ def translator(word: str, lang: str = None):
             return translation
 
     
-    
+# search for api
+def search_func(q, field, queryset, fields, image_fields, request, product=False):
+    langs = Languages.objects.filter(active=True)
+    results = []
+
+    for lang in langs:
+        for item in queryset:
+            if product:
+                src_field = item.product.__dict__.get(field).get(lang.code)
+            else:
+                src_field = item.__dict__.get(field).get(lang.code)
+            
+
+            if str(src_field).lower().startswith(str(q).lower()):
+                serializer = BasedModelSerializer(instance=item.__dict__, context={"lang": lang.code, 'fields': fields, 'image_fields': image_fields, 'request': request})
+                print(serializer.data)
+                results.append(serializer.data)
+                
+
+
+    return results
+                
+        

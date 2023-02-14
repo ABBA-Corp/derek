@@ -16,6 +16,6 @@ urlpatterns = [
     path('products/<slug:slug>', views.ProductVariantDetail.as_view()),
     path("top_produts", views.TopProductsView.as_view()),
     path("add_aplication", views.NewAppliction.as_view()),
-    path("search", views.ProductsSearch.as_view()),
+    path("search", views.Search.as_view()),
     path("get_product_variant", views.ProductVariantGet.as_view()),
 ]

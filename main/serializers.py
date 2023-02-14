@@ -3,12 +3,11 @@ from admins.models import Languages
 from rest_framework import serializers
 from easy_thumbnails.templatetags.thumbnail import thumbnail_url
 from admins.models import Articles, StaticInformation, AboutUs, Languages, Translations, MetaTags, Reviews, Partners, ShortApplication
-from .utils import translator
 
 
-class ThumbnailSerializer(serializers.ImageField):
-    def __init__(self, alias, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class ThumbnailSerializer(serializers.BaseSerializer):
+    def __init__(self, alias, instance=None, **kwargs):
+        super().__init__(instance, **kwargs)
         self.alias = alias
 
     def to_representation(self, instance):
@@ -22,6 +21,52 @@ class ThumbnailSerializer(serializers.ImageField):
             return request.build_absolute_uri(url)
 
         return url
+
+
+# format date
+def get_format_date(date):
+    m = str(date.month)
+    if len(m) == 1:
+        m = '0' + m
+
+    d = str(date.day)
+    if len(d) == 1:
+        d = '0' + d
+
+    return d + '.' + m + '.' + str(date.year)
+
+
+# based model serializer
+class BasedModelSerializer(serializers.BaseSerializer):
+    def to_representation(self, instance):
+        data_dict = {}
+        lang = self.context.get('lang')
+        fields = self.context.get("fields")
+        image_fields = self.context.get("image_fields")
+
+        for field in fields:
+            if 'date' in str(field):
+                try:
+                    data_dict[field] = get_format_date(instance.get(field))
+                except:
+                    data_dict[field] = None
+                continue
+
+            try: 
+                data_dict[field] = instance.get(field).get(lang)
+            except:
+                data_dict[field] = instance.get(field, None)
+
+    
+        for image in image_fields:
+            data_dict[image] = ThumbnailSerializer(instance=instance.get(image), alias='product_photo', context={'request': self.context.get("request")}).data
+
+        
+        
+
+        return data_dict
+
+
 
 
 # field lang serializer
