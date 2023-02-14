@@ -23,18 +23,20 @@ def search_func(q, field, queryset, fields, image_fields, request, product=False
 
     for lang in langs:
         for item in queryset:
+            dct = item.__dict__
             if product:
                 src_field = item.product.__dict__.get(field).get(lang.code)
+                dct['name'] = item.product.name.get(lang.code, None)
             else:
                 src_field = item.__dict__.get(field).get(lang.code)
+                
             
 
             if str(src_field).lower().startswith(str(q).lower()):
-                serializer = BasedModelSerializer(instance=item.__dict__, context={"lang": lang.code, 'fields': fields, 'image_fields': image_fields, 'request': request})
+                serializer = BasedModelSerializer(instance=dct, context={"lang": lang.code, 'fields': fields, 'image_fields': image_fields, 'request': request})
                 print(serializer.data)
                 results.append(serializer.data)
                 
-
 
     return results
                 

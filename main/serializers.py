@@ -43,7 +43,6 @@ class BasedModelSerializer(serializers.BaseSerializer):
         lang = self.context.get('lang')
         fields = self.context.get("fields")
         image_fields = self.context.get("image_fields")
-
         for field in fields:
             if 'date' in str(field):
                 try:
