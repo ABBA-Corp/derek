@@ -66,7 +66,7 @@
                                 {% if object and object.name|get_item:lang.code %} value="{{ object.name|get_item:lang.code }}" 
                                 {% elif request_post and request_post|get_item:'name' %}
                                     value="{{ request_post|get_item:'name'|get_item:lang.code }}" 
-                                {% endif %} required>
+                                {% endif %}>
                                 {% if name_error %}
                                 <div class="invalid-feedback" style="display: block;">
                                     {{ name_error }}
