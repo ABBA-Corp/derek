@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import Products, Category, AtributOptions, Atributs, ProductVariants, Colors
 from rest_framework import generics, views, pagination, filters
 from .serializers import ProductsSerializer, Categoryserializer, ProductVariantSimpleSerializer, ReviewSerializer, ShortApplicationSerializer, TranslationsSerializerBadVersion
-from .serializers import ArticleSerializer, StaticInformationSerializer, TranslationSerializer, LangsSerializer, PartnersSerializer, ProductVariantDetailSerializer
+from .serializers import ArticleSerializer, StaticInformationSerializer, TranslationSerializer, LangsSerializer, PartnersSerializer, ProductVariantDetailSerializer, ArticleDetailSerializer
 from admins.models import Articles, StaticInformation, Partners, Reviews, Translations, Languages, ShortApplication
 from rest_framework.response import Response
 from admins.utils import list_of_dicts_to_queryset
@@ -25,7 +25,7 @@ class ArticlesList(generics.ListAPIView):
 # articles detail
 class ArticlesDetail(generics.RetrieveAPIView):
     queryset = Articles.objects.filter(active=True)
-    serializer_class = ArticleSerializer
+    serializer_class = ArticleDetailSerializer
     lookup_field = 'slug'
 
 
