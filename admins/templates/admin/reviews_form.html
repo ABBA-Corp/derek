@@ -87,6 +87,23 @@
                     </div>
                 {% endfor %}
                 <!-- Project cover -->
+
+                <div class="form-group">
+                    <!-- Label  -->
+                    <label class="form-label">
+                        Рейтинг
+                    </label>
+                    <br>
+                    <!-- Input -->
+                    <input type="number" max="5" min="1" name="rating" class="form-control" 
+                    {% if object and object.rating %} value="{{ object.rating }}" 
+                        {% elif request_post and request_post|get_item:'rating' %} value="{{ request_post|get_item:'rating' }}" {% endif %} >
+                    {% if rating_error %}
+                    <div class="invalid-feedback" style="display: block;">
+                        {{ rating_error }}
+                    </div>
+                    {% endif %}
+                </div>
                 <div class="form-group">
                     <!-- Label  -->
                     <label class="form-label mb-1">
