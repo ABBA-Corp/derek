@@ -1517,47 +1517,47 @@ class CategoryCreate(CreateView):
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
-        try:
-            category = Category(**data_dict)
-            category.full_clean()
-            category.save()
+        #try:
+        category = Category(**data_dict)
+        category.full_clean()
+        category.save()
 
-            if cotalog:
-                category.cotalog = cotalog
+        if cotalog:
+            category.cotalog = cotalog
 
-            if atributs:
-                try:
-                    atr_list = [Atributs.objects.get(id=int(it)) for it in atributs]
-                    category.atributs.set(atr_list)
-                except:
-                    pass
+        if atributs:
+            try:
+                atr_list = [Atributs.objects.get(id=int(it)) for it in atributs]
+                category.atributs.set(atr_list)
+            except:
+                pass
 
-            key = self.model._meta.verbose_name
-            sess_images = request.session.get(f'{key}_image')
-            images = [it for it in sess_images if it['id'] == '']
+        key = self.model._meta.verbose_name
+        sess_images = request.session.get(f'{key}_image')
+        images = [it for it in sess_images if it['id'] == '']
 
-            if sess_images and len(images) > 0:
-                image = images[0]
+        if sess_images and len(images) > 0:
+            image = images[0]
 
-                category.image = image['name']
-                request.session.get(f'{key}_image').remove(image)
-                request.session.modified = True
+            category.image = image['name']
+            request.session.get(f'{key}_image').remove(image)
+            request.session.modified = True
 
-            sess_icons = request.session.get(f'{key}_icon')
-            icons = [it for it in sess_icons if it['id'] == '']
+        sess_icons = request.session.get(f'{key}_icon')
+        icons = [it for it in sess_icons if it['id'] == '']
 
-            if sess_icons and len(icons) > 0:
-                icon = icons[0]
+        if sess_icons and len(icons) > 0:
+            icon = icons[0]
 
-                category.icon = icon['name']
-                request.session.get(f'{key}_icon').remove(icon)
-                request.session.modified = True
+            category.icon = icon['name']
+            request.session.get(f'{key}_icon').remove(icon)
+            request.session.modified = True
 
-            category.save()            
-        except:
-            data['request_post'] = data_dict
-            data['some_error'] = 'This field is required.'
-            return render(request, self.template_name, data)
+        category.save()            
+        #except:
+        #    data['request_post'] = data_dict
+        #    data['some_error'] = 'This field is required.'
+        #    return render(request, self.template_name, data)
 
         return redirect('category_list')
 
