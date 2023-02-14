@@ -45,7 +45,7 @@ class BasedListView(ListView):
         for field in fields:
             for item in queryset:
                 for lang in langs:
-                    if query.lower() in str(item[field][lang.code]).lower():
+                    if query.lower() in str(item.get(field, {}).get(lang.code, '')).lower():
                         if item['id'] not in [it['id'] for it in endlist]:
                             endlist.append(item)
                     continue
