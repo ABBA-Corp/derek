@@ -1555,7 +1555,9 @@ class CategoryCreate(CreateView):
 
             category.save()            
         except:
-            pass
+            data['request_post'] = data_dict
+            data['some_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
 
         return redirect('category_list')
 
