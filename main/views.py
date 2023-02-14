@@ -84,7 +84,6 @@ class CategoryList(generics.ListAPIView):
 class CategoryDetailView(generics.RetrieveAPIView):
     queryset = Category.objects.all()
     serializer_class = Categoryserializer
-    lookup_field = 'slug'
 
 
 # products list

@@ -205,7 +205,6 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
             for opt in atr.options.all():
                 opt_dict = {}
                 opt_dict['id'] = opt.id
-                opt_dict['slug'] = opt.slug
                 opt_dict['name'] = JsonFieldSerializer(opt.name, context={'request': self.context.get('request')}).data
                 opt_dict['curent'] = opt in instance.options.all()
 

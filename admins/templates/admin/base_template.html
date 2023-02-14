@@ -95,6 +95,23 @@
                             </ul>
                         </div>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#sidebarCotalog" data-bs-toggle="collapse" role="button" aria-expanded="false"
+                            aria-controls="sidebarCotalog">
+                            <i class="fe fe-file"></i> Коталог
+                        </a>
+                        <div class="collapse" id="sidebarCotalog">
+                            <ul class="nav nav-sm flex-column">
+                                <li class="nav-item">
+                                    <a href="{% url 'category_list' %}" class="nav-link" role="button" aria-expanded="false"
+                                        aria-controls="sidebarPages">
+                                        Категории
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link " href="{% url 'partners_list' %}">
                             <i class="fe fe-book-open"></i> Партнеры

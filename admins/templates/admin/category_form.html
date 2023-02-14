@@ -12,7 +12,7 @@
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
     <li class="breadcrumb-item ">
-        <a href="{% url 'partners_list' %}">Категории</a>
+        <a href="{% url 'category_list' %}">Категории</a>
     </li>
     <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
         Создать
@@ -121,6 +121,9 @@
                     <br>
                     <!-- Input -->
                     <input type="file" name="cotalog" class="form-control" id="customFileUploadMultiple">
+                    {% if object and object.cotalog %}
+                    <a href="{{ object.cotalog.url }}">Скачать</a>
+                    {% endif %}
                 </div>
     
                 <div class="row">

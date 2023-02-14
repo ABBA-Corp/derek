@@ -10,6 +10,7 @@ from django.utils.text import slugify
 import string
 import random
 from admins.models import unique_slug_generator
+import cyrtranslit
 # Create your models here.
 
 
@@ -24,7 +25,7 @@ class Colors(models.Model):
         if not self.slug:
             lng = Languages.objects.filter(active=True).filter(default=True).first()
             str = self.name.get(lng.code)
-            slug = slugify(str)
+            slug = cyrtranslit.to_latin(slugify(str))
             self.slug = unique_slug_generator(self, slug)
 
         return super().save(*args, **kwargs)
@@ -39,40 +40,19 @@ class Atributs(models.Model):
 # atribut option
 class AtributOptions(models.Model):
     name = models.JSONField("Name", blank=True, null=True)
-    slug = models.SlugField('Slug', editable=False, unique=True)
     atribut = models.ForeignKey(Atributs, on_delete=models.CASCADE, related_name='options')
 
-
-    def save(self, *args, **kwargs):  # new
-        if not self.slug:
-            lng = Languages.objects.filter(active=True).filter(default=True).first()
-            str = self.name.get(lng.code)
-            slug = slugify(str)
-            self.slug = unique_slug_generator(self, slug)
-
-        return super().save(*args, **kwargs)
-
-    
 
 
 # category
 class Category(models.Model):
     name = models.JSONField('Name', blank=True, null=True)
-    slug = models.SlugField('Slug', editable=False, unique=True)
     deckription = models.JSONField("Deckription", blank=True, null=True)
     icon = ThumbnailerImageField(upload_to='ctg_icons', blank=True, null=True)
     image = ThumbnailerImageField(upload_to='ctg_image', blank=True, null=True)
     atributs = models.ManyToManyField(Atributs, blank=True, null=True)
     cotalog = models.FileField('Cotalog for download', upload_to='cotalog_fiels', blank=True, null=True)
 
-    def save(self, *args, **kwargs):  # new
-        if not self.slug:
-            lng = Languages.objects.filter(active=True).filter(default=True).first()
-            str = self.name.get(lng.code)
-            slug = slugify(str)
-            self.slug = unique_slug_generator(self, slug)
-
-        return super().save(*args, **kwargs)
 
 
 # products
@@ -88,7 +68,7 @@ class Products(models.Model):
     def save(self, *args, **kwargs):  # new
         if not self.slug:
             lng = Languages.objects.filter(active=True).filter(default=True).first()
-            str = self.name.get(lng.code)
+            str = cyrtranslit.to_latin(self.name.get(lng.code))
             slug = slugify(str)
             self.slug = unique_slug_generator(self, slug)
 
@@ -111,7 +91,7 @@ class ProductVariants(models.Model):
     def save(self, *args, **kwargs):  # new
         if not self.slug:
             lng = Languages.objects.filter(active=True).filter(default=True).first()
-            str = self.product.name.get(lng.code, 'prod') + self.color.name.get(lng.code, 'color')
+            str = cyrtranslit.to_latin(self.product.name.get(lng.code, 'prod') + self.color.name.get(lng.code, 'color'))
             slug = slugify(str)
             self.slug = unique_slug_generator(self, slug, Products)
 
