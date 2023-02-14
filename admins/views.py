@@ -1533,8 +1533,9 @@ class CategoryCreate(CreateView):
                 pass
 
         key = self.model._meta.verbose_name
-        sess_images = request.session.get(f'{key}_image', [])
-        images = [it for it in sess_images if it['id'] == '']
+        sess_images = request.session.get(f'{key}_image')
+        if sess_images:
+            images = [it for it in sess_images if it['id'] == '']
 
         if sess_images and len(images) > 0:
             image = images[0]
@@ -1544,7 +1545,9 @@ class CategoryCreate(CreateView):
             request.session.modified = True
 
         sess_icons = request.session.get(f'{key}_icon')
-        icons = [it for it in sess_icons if it['id'] == '']
+
+        if sess_icons:
+            icons = [it for it in sess_icons if it['id'] == '']
 
         if sess_icons and len(icons) > 0:
             icon = icons[0]
