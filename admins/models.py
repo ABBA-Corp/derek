@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from django.utils.text import slugify
 import random
 import string
+import cyrtranslit
 # telephone nbm validator
 
 
@@ -154,9 +155,8 @@ class Articles(models.Model):
 
     def save(self, *args, **kwargs):  # new
         if not self.slug:
-            lng = Languages.objects.filter(
-                active=True).filter(default=True).first()
-            str = self.title.get(lng.code)
+            lng = Languages.objects.filter(active=True).filter(default=True).first()
+            str = cyrtranslit.to_latin(self.title.get(lng.code))
             slug = slugify(str)
             self.slug = unique_slug_generator(self, slug)
 

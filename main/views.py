@@ -162,6 +162,11 @@ class ProductsSearch(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
 
+# search 
+class Search(views.APIView):
+    def get(self, request, fromat=None):
+        pass
+
 
 # application add
 class NewAppliction(generics.CreateAPIView):

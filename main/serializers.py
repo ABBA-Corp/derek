@@ -199,6 +199,20 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Articles
         fields = '__all__'
 
+    
+# article detail serializer
+class ArticleDetailSerializer(serializers.ModelSerializer):
+    title = JsonFieldSerializer()
+    subtitle = JsonFieldSerializer()
+    body = JsonFieldSerializer()
+    created_date = serializers.DateField(format="%d.%m.%Y")
+    image = ThumbnailSerializer(alias='original')
+    meta = MetaFieldSerializer()
+
+    class Meta:
+        model = Articles
+        fields = '__all__'
+
 
 # static information
 class StaticInformationSerializer(serializers.ModelSerializer):

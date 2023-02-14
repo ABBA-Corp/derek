@@ -20,11 +20,11 @@
 </ol>
 {% endblock %}
 
-{% block content_width %} class="col-11" {% endblock %}
+{% block content_width %} class="col-12" {% endblock %}
 
 
 {% block content %}
-<form method="POST" enctype="multipart/form-data" action="">
+<form method="POST" class="row" enctype="multipart/form-data" action="">
     {% csrf_token %}
     <input type="hidden" name="dropzone-key" value="{{ dropzone_key }}">
     <input type="hidden" name="id" value="{{ object.id }}">
@@ -122,7 +122,6 @@
                     <!-- Input -->
                     <input type="file" name="cotalog" class="form-control" id="customFileUploadMultiple">
                 </div>
-    
     
                 <div class="row">
                     <div class="col-6">
@@ -267,6 +266,7 @@
                                         </div>
                                     </div>
                                     {% endfor %}
+                                    {% endif %}
                                     
                                 </div>
                 
@@ -293,7 +293,8 @@
                 </div>
     
             </div>
-   
+        </div>
+    </div>
 </form>
 <script>
     for (let txt of document.querySelectorAll('.editor')) {

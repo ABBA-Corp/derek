@@ -336,9 +336,8 @@ def del_article(request):
 
     return redirect(url)
 
+
 # article update
-
-
 class ArticleUpdate(UpdateView):
     model = Articles
     template_name = 'admin/new_article.html'
@@ -897,12 +896,10 @@ class AddArticleCtg(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(AddArticleCtg, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(
-            active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
         context['categories'] = ArticleCategories.objects.order_by('-id')
         context['fields'] = get_model_fields(self.model)
-        context['lang'] = Languages.objects.filter(
-            active=True).filter(default=True).first()
+        context['lang'] = Languages.objects.filter(active=True).filter(default=True).first()
         context['dropzone_key'] = self.model._meta.verbose_name
         context['images'] = []
 
@@ -1478,15 +1475,17 @@ class PartnersEdit(UpdateView):
 class CategoryList(BasedListView):
     model = Category
     search_fields = ['name']
+    template_name = 'admin/category_list.html'
     
 
 # category create
 class CategoryCreate(CreateView):
     model = Category
     fields = '__all__'
+    template_name = 'admin/category_form.html'
 
     def get_context_data(self, **kwargs):
-        context = super(PartnersCreate, self).get_context_data(**kwargs)
+        context = super(CategoryCreate, self).get_context_data(**kwargs)
         context['langs'] = Languages.objects.filter(active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
         context['dropzone_key'] = self.model._meta.verbose_name
@@ -1511,6 +1510,7 @@ class CategoryCreate(CreateView):
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
         atributs = request.POST.getlist('atributs[]')
+        cotalog = request.FILES.get("cotalog")
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
@@ -1521,6 +1521,9 @@ class CategoryCreate(CreateView):
             category = Category(**data_dict)
             category.full_clean()
             category.save()
+
+            if cotalog:
+                category.cotalog = cotalog
 
             if atributs:
                 try:
@@ -1554,7 +1557,7 @@ class CategoryCreate(CreateView):
         except:
             pass
 
-        return redirect('partners_list')
+        return redirect('category_list')
 
 
 
@@ -1562,9 +1565,10 @@ class CategoryCreate(CreateView):
 class CategoryEdit(UpdateView):
     model = Category
     fields = '__all__'
+    template_name = 'admin/category_form.html'
 
     def get_context_data(self, **kwargs):
-        context = super(PartnersCreate, self).get_context_data(**kwargs)
+        context = super(CategoryEdit, self).get_context_data(**kwargs)
         context['langs'] = Languages.objects.filter(active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
         context['dropzone_key'] = self.model._meta.verbose_name
@@ -1632,4 +1636,4 @@ class CategoryEdit(UpdateView):
 
         instance.save()
 
-        return redirect("partners_list")
+        return redirect("category_list")

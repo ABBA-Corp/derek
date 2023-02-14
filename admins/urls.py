@@ -84,11 +84,14 @@ urlpatterns = [
     path("reviews/create", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ReviewsCreate.as_view()), name='review_create'),
     path('reviews/<int:pk>/edit', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ReviewsUpdate.as_view()), name='review_edit'),
     path('delete_review_image', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.delete_review_image), name='del_review_image'),
-    path("partners", views.PartnersList.as_view(), name='partners_list'),
-    path("partners/create", views.PartnersCreate.as_view(), name='partners_create'),
-    path("partners/<int:pk>/edit", views.PartnersEdit.as_view(), name='partners_edit'),
+    path("partners", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.PartnersList.as_view()), name='partners_list'),
+    path("partners/create", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.PartnersCreate.as_view()), name='partners_create'),
+    path("partners/<int:pk>/edit", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.PartnersEdit.as_view()), name='partners_edit'),
     path('quick_applications', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ShortApplicationList.as_view()), name='short_aplic_list'),
     path('quick_applications/<int:pk>/edit', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ShortApplicationUpdate.as_view()), name='short_aplic_edit'),
+    path('categories', views.CategoryList.as_view(), name='category_list'),
+    path('categories/create', views.CategoryCreate.as_view(), name='category_create'),
+    path("category/<int:pk>/edit", views.CategoryEdit.as_view(), name='category_edit')
 
     #path("fill_db_qwertyuiop", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.fill_db_view))
 ]
