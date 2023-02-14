@@ -91,7 +91,13 @@ urlpatterns = [
     path('quick_applications/<int:pk>/edit', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ShortApplicationUpdate.as_view()), name='short_aplic_edit'),
     path('categories', views.CategoryList.as_view(), name='category_list'),
     path('categories/create', views.CategoryCreate.as_view(), name='category_create'),
-    path("categories/<int:pk>/edit", views.CategoryEdit.as_view(), name='category_edit')
+    path("categories/<int:pk>/edit", views.CategoryEdit.as_view(), name='category_edit'),
+    path('del_ctg_files', views.del_category_file, name='del_ctg_file'),
+    path('atributs', views.AtributsList.as_view(), name='atr_list'),
+    path("atributs/create", views.AtributsCreate.as_view(), name='atr_create'),
+    path('colors', views.ColorsList.as_view(), name='color_list'),
+    path("colors/create", views.ColorsCreate.as_view(), name='color_create'),
+    path("colors/<int:pk>/edit", views.ColorEdit.as_view(), name='colors_edit')
 
     #path("fill_db_qwertyuiop", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.fill_db_view))
 ]

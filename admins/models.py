@@ -66,6 +66,7 @@ class StaticInformation(models.Model):
     nbm = models.CharField("Номер телефона", blank=True, null=True, max_length=255)
     map = models.TextField('Iframe карты', blank=True, null=True)
     work_time = models.JSONField('Время работы', blank=True, null=True)
+    cotalog = models.FileField('Cotalog docx', upload_to='cotalog_docx', blank=True, null=True)
 
 
     class Meta:

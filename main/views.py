@@ -176,7 +176,7 @@ class Search(views.APIView):
 
         articles_results = search_func(q, 'title', queryset=articles, fields=['title', 'subtitle', 'slug', 'created_date'], image_fields=['image'], request=request)
         product_results = search_func(q, 'name', queryset=products, fields=['name', 'slug'], image_fields=['image'], request=request, product=True)
-        cotalog_results = search_func(q, 'name', queryset=categories, fields=['name', 'slug'], image_fields=['image'], request=request)
+        cotalog_results = search_func(q, 'name', queryset=categories, fields=['name', 'id'], image_fields=['image'], request=request)
 
         res_data = {}
         res_data['products'] = product_results

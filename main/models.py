@@ -17,16 +17,17 @@ import cyrtranslit
 # colors
 class Colors(models.Model):
     name = models.JSONField('Name', blank=True, null=True)
-    slug = models.SlugField('Slug', editable=False, unique=True)
+    slug = models.SlugField('Slug', editable=False, unique=True, blank=True, null=True)
     hex = ColorField(default='#FF0000')
     
 
     def save(self, *args, **kwargs):  # new
         if not self.slug:
             lng = Languages.objects.filter(active=True).filter(default=True).first()
-            str = self.name.get(lng.code)
-            slug = cyrtranslit.to_latin(slugify(str))
+            str = cyrtranslit.to_latin(self.name.get(lng.code))
+            slug = slugify(str)
             self.slug = unique_slug_generator(self, slug)
+            print(self.slug)
 
         return super().save(*args, **kwargs)
 
@@ -58,7 +59,7 @@ class Category(models.Model):
 # products
 class Products(models.Model):
     name = models.JSONField('Name', blank=True, null=True)
-    slug = models.SlugField('Slug', editable=False, unique=True)
+    slug = models.SlugField('Slug', editable=False, unique=True, blank=True, null=True)
     type = models.JSONField("Type", blank=True, null=True)
     manufacturer = models.JSONField("Manuf", blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')

@@ -24,6 +24,7 @@ from django.contrib.auth import logout
 import os
 from django.conf import settings
 import requests
+from main.serializers import ColorSerializer
 
 # Create your views here.
 
@@ -234,6 +235,10 @@ def del_statics_image(request):
             model.logo_first.delete()
         elif key == 'logo2':
             model.logo_second.delete()
+        elif key == 'cotalog':
+            model.cotalog.delete()
+        
+        model.save()
     except:
         pass
 
@@ -529,7 +534,7 @@ class StaticUpdate(UpdateView):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(StaticInformation, request)
         instance = self.get_object()
-        print(instance)
+        cotalog = request.FILES.get("cotalog")
 
         data = self.get_context_data()
         if is_valid_field(data_dict, 'title') == False:
@@ -540,6 +545,10 @@ class StaticUpdate(UpdateView):
             try:
                 for attr, value in data_dict.items():
                     setattr(instance, attr, value)
+
+                if cotalog:
+                    instance.cotalog = cotalog
+
                 instance.save()
             except:
                 data['request_post'] = data_dict
@@ -1529,50 +1538,50 @@ class CategoryCreate(CreateView):
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
-        #try:
-        category = Category(**data_dict)
-        category.full_clean()
-        category.save()
+        try:
+            category = Category(**data_dict)
+            category.full_clean()
+            category.save()
 
-        if cotalog:
-            category.cotalog = cotalog
+            if cotalog:
+                category.cotalog = cotalog
 
-        if atributs:
-            try:
-                atr_list = [Atributs.objects.get(id=int(it)) for it in atributs]
-                category.atributs.set(atr_list)
-            except:
-                pass
+            if atributs:
+                try:
+                    atr_list = [Atributs.objects.get(id=int(it)) for it in atributs]
+                    category.atributs.set(atr_list)
+                except:
+                    pass
 
-        key = self.model._meta.verbose_name
-        sess_images = request.session.get(f'{key}_image')
-        if sess_images:
-            images = [it for it in sess_images if it['id'] == '']
+            key = self.model._meta.verbose_name
+            sess_images = request.session.get(f'{key}_image')
+            if sess_images:
+                images = [it for it in sess_images if it['id'] == '']
 
-        if sess_images and len(images) > 0:
-            image = images[0]
+            if sess_images and len(images) > 0:
+                image = images[0]
 
-            category.image = image['name']
-            request.session.get(f'{key}_image').remove(image)
-            request.session.modified = True
+                category.image = image['name']
+                request.session.get(f'{key}_image').remove(image)
+                request.session.modified = True
 
-        sess_icons = request.session.get(f'{key}_icon')
+            sess_icons = request.session.get(f'{key}_icon')
 
-        if sess_icons:
-            icons = [it for it in sess_icons if it['id'] == '']
+            if sess_icons:
+                icons = [it for it in sess_icons if it['id'] == '']
 
-        if sess_icons and len(icons) > 0:
-            icon = icons[0]
+            if sess_icons and len(icons) > 0:
+                icon = icons[0]
 
-            category.icon = icon['name']
-            request.session.get(f'{key}_icon').remove(icon)
-            request.session.modified = True
+                category.icon = icon['name']
+                request.session.get(f'{key}_icon').remove(icon)
+                request.session.modified = True
 
-        category.save()            
-        #except:
-        #    data['request_post'] = data_dict
-        #    data['some_error'] = 'This field is required.'
-        #    return render(request, self.template_name, data)
+            category.save()            
+        except:
+            data['request_post'] = data_dict
+            data['some_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
 
         return redirect('category_list')
 
@@ -1596,12 +1605,12 @@ class CategoryEdit(UpdateView):
     def form_valid(self, form):
         return None
 
-
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
         atributs = request.POST.getlist('atributs[]')
+        cotalog = request.FILES.get("cotalog")
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
@@ -1613,6 +1622,9 @@ class CategoryEdit(UpdateView):
 
         for attr, value in data_dict.items():
             setattr(instance, attr, value)
+
+        if cotalog:
+            instance.cotalog = cotalog
         
         if atributs:
             try:
@@ -1654,3 +1666,170 @@ class CategoryEdit(UpdateView):
         instance.save()
 
         return redirect("category_list")
+
+
+def del_category_file(request):
+    pk = request.POST.get('obj_id')
+    key = request.POST.get('key')
+
+    try:
+        ctg = Category.objects.get(pk=int(pk))
+        if key == 'image':
+            ctg.image.delete()
+        elif key == 'icon':
+            ctg.icon.delete()
+        elif key == 'cotalog':
+            ctg.cotalog.delete()
+
+        ctg.save()
+
+    except:
+        return JsonResponse("error", safe=False)
+
+    return JsonResponse('success', safe=False)
+
+
+# atributs
+class AtributsList(BasedListView):
+    model = Atributs
+    search_fields = ['name']
+    template_name = 'admin/atributs.html'
+
+
+# atributs create
+class AtributsCreate(CreateView):
+    model = Atributs
+    fields = '__all__'
+    template_name = 'admin/atributs_form.html'
+
+    
+    def get_context_data(self, **kwargs):
+        context = super(AtributsCreate, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+
+        return context
+
+    
+    def form_valid(self, form):
+        return None
+
+    def post(self, request, *args, **kwargs):
+        context = super().post(request, *args, **kwargs)
+        data_dict = serialize_request(self.model, request)
+        data = self.get_context_data()
+
+        if is_valid_field(data_dict, 'name') == False:
+            data['request_post'] = data_dict
+            data['name_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
+
+        try:
+            atribut = Atributs(**data_dict)
+            atribut.full_clean()
+            atribut.save()
+            
+            langs = Languages.objects.filter(active=True)
+
+            for _ in langs.count():
+                #options = request.POST.get(f'options#{lng.code}')
+                pass#option = AtributOptions.objects.create(atribut=atribut, pass)
+
+
+        except:
+            pass
+
+        
+
+        return redirect("home")
+
+
+# colors
+class ColorsList(BasedListView):
+    model = Colors
+    search_fields = ['name']
+    template_name = 'admin/colors_list.html'
+
+
+# colors create
+class ColorsCreate(CreateView):
+    model = Colors
+    fields = '__all__'
+    template_name = 'admin/colors_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ColorsCreate, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+
+
+        print(ColorSerializer(Colors.objects.all(), many=True, context={'request': self.request}).data)
+
+        return context
+
+
+    def form_valid(self, form):
+        return None
+
+    def post(self, request, *args, **kwargs):
+        context = super().post(request, *args, **kwargs)
+        data_dict = serialize_request(self.model, request)
+        data = self.get_context_data()
+
+        if is_valid_field(data_dict, 'name') == False:
+            data['request_post'] = data_dict
+            data['name_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
+
+        if data_dict.get('hex') is None:
+            data['request_post'] = data_dict
+            data['hex_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
+
+        #try:
+        color = Colors(**data_dict)
+        print(color.slug)
+        color.full_clean()
+        color.save()
+        #except:
+        #    pass
+
+        return redirect('color_list')
+
+
+
+# color edit
+class ColorEdit(UpdateView):
+    model = Colors
+    fields = '__all__'
+    template_name = 'admin/colors_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ColorEdit, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+
+        return context
+
+    def form_valid(self, form):
+        return None
+
+    def post(self, request, *args, **kwargs):
+        context = super().post(request, *args, **kwargs)
+        data_dict = serialize_request(self.model, request)
+        data = self.get_context_data()
+
+        if is_valid_field(data_dict, 'name') == False:
+            data['request_post'] = data_dict
+            data['name_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
+
+        instance = self.get_object()
+
+        for attr, value in data_dict.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        return redirect("color_list")
