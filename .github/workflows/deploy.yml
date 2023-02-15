@@ -27,7 +27,7 @@ jobs:
     - name: Command using from script
       uses: appleboy/ssh-action@master
       env:
-        DJANGO_SETTINGS_MODULE: "matelog.production"
+        DJANGO_SETTINGS_MODULE: "derek.production"
       with:
         host: ${{ secrets.HOST }}
         USERNAME: ${{ secrets.USERNAME }}
