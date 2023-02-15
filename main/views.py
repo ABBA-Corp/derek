@@ -94,10 +94,10 @@ class ProductsList(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = ProductVariants.objects.filter(default=True)
-        ctg_slug = self.request.GET.get("category")
+        ctg_id = self.request.GET.get("category")
 
         try:
-            category = Category.objects.get(slug=ctg_slug)
+            category = Category.objects.get(id=ctg_id)
             queryset = queryset.filter(category=category)
         except:
             pass

@@ -1891,3 +1891,20 @@ class ProductsCreate(CreateView):
         context['lang'] = Languages.objects.filter(default=True).first()
 
         return context
+
+    def form_valid(self, form):
+        return None
+
+    
+    def post(self, request, *args, **kwargs):
+        context = super().post(request, *args, **kwargs)
+        data_dict = serialize_request(self.model, request)
+        data = self.get_context_data()
+
+
+        if is_valid_field(data_dict, 'name') == False:
+            data['request_post'] = data_dict
+            data['name_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
+        
+        
