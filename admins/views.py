@@ -1549,10 +1549,11 @@ class AtributOptionEdit(UpdateView):
     model = AtributOptions
     fields = '__all__'
 
-    def get_object(self, queryset):
+    def get_object(self):
         try:
-            id = self.request.GET.get("id")
-            return queryset.get(id=int(id))
+            id = self.request.POST.get("id")
+            print(id)
+            return AtributOptions.objects.get(id=int(id))
         except:
             return None
 
@@ -1656,6 +1657,7 @@ class ColorEdit(UpdateView):
 class ProductsList(BasedListView):
     model = Products
     search_fields = ['name']
+    template_name = 'admin/products.html'
 
 
 # checkbox to boolean
@@ -1724,25 +1726,22 @@ def get_variant_dict(request, i, data, template_name, product):
 
 
 # products create
-class ProductsCreate(CreateView):
+class ProductsCreate(BasedCreateView):
     model = Products
     fields = '__all__'
+    template_name = 'admin/products_form.html'
+    related_model = Category
+
 
     def get_context_data(self, **kwargs):
-        context = super(ProductsCreate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(
-            active=True).order_by('-default')
-        context['lang'] = Languages.objects.filter(default=True).first()
-
+        context = super().get_context_data(**kwargs)
+        context['colors'] = Colors.objects.all()
         return context
-
-    def form_valid(self, form):
-        return None
 
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
-        category_id = request.POST.get('category')
+        category_id = request.POST.get('category', 0)
 
         data = self.get_context_data()
         variants_count = request.POST.get('variant_count')
@@ -1752,7 +1751,7 @@ class ProductsCreate(CreateView):
             data_dict['category'] = category.first()
         else:
             data['request_post'] = data_dict
-            data['name_error'] = 'This field is invalid.'
+            data['category_error'] = 'This field is invalid.'
             return render(request, self.template_name, data)
 
         if variants_count is None:
@@ -1791,6 +1790,7 @@ class ProductsCreate(CreateView):
 class ProductEdit(UpdateView):
     model = Products
     fields = '__all__'
+    template_name = 'admin/products_form.html'
 
     def get_context_data(self, **kwargs):
         context = super(ProductEdit, self).get_context_data(**kwargs)

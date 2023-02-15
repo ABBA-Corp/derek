@@ -91,7 +91,9 @@ urlpatterns = [
     path("atribut_options/get", views.get_option, name='get_atr_option'),
     path('colors', views.ColorsList.as_view(), name='color_list'),
     path("colors/create", views.ColorsCreate.as_view(), name='color_create'),
-    path("colors/<int:pk>/edit", views.ColorEdit.as_view(), name='colors_edit')
+    path("colors/<int:pk>/edit", views.ColorEdit.as_view(), name='colors_edit'),
+    path("products", views.ProductsList.as_view(), name='products_list'),
+    path('products/create', views.ProductsCreate.as_view(), name='products_create')
 
     #path("fill_db_qwertyuiop", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.fill_db_view))
 ]

@@ -1,12 +1,9 @@
-from django.shortcuts import render
 from .models import Products, Category, AtributOptions, Atributs, ProductVariants, Colors
 from rest_framework import generics, views, pagination, filters
 from .serializers import ProductsSerializer, Categoryserializer, ProductVariantSimpleSerializer, ReviewSerializer, ShortApplicationSerializer, TranslationsSerializerBadVersion
 from .serializers import ArticleSerializer, StaticInformationSerializer, TranslationSerializer, LangsSerializer, PartnersSerializer, ProductVariantDetailSerializer, ArticleDetailSerializer
 from admins.models import Articles, StaticInformation, Partners, Reviews, Translations, Languages, ShortApplication
 from rest_framework.response import Response
-from admins.utils import list_of_dicts_to_queryset
-from django.db.models import Q
 from .utils import search_func
 # Create your views here.
 

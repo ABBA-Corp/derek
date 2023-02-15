@@ -22,9 +22,10 @@ $('.atribut_options').on('click', (e) => {
 })
 
 
-$('.option-edit-form').on('submit', (e) => {
+$('#option-edit-form').on('submit', (e) => {
     e.preventDefault()
     let data = $(e.target).serialize()
+    console.log(data)
     let url = `atribut_options/edit`
     console.log(data)
 
@@ -32,8 +33,10 @@ $('.option-edit-form').on('submit', (e) => {
         url: url,
         type: 'POST',
         data: data,
+        datatype: 'json',
         success: (data) => {
             console.log(data)
+            $('#atributOptionModal').modal('hide')
         }
     })
 

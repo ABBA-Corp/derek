@@ -102,7 +102,7 @@
                     <br>
                     <!-- Input -->
                     <select class="form-control mb-4" data-choices='{"removeItemButton": true}' name="atributs[]" multiple>
-                        {% for atr in atributs %}
+                        {% for atr in relateds %}
                             {% if object and atr in object.atributs.all %}
                                 <option value="{{ atr.id }}" selected>{{ atr.name|get_item:lang.code }}</option>
                             {% elif request_post and atr.id in request_post|get_item:'atributs' %}

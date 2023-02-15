@@ -94,7 +94,7 @@
                             <!-- Input -->
                             <select class="form-select mb-3" name="parent">
                                 <option value="">-----</option>
-                                {% for ctg in categories %}
+                                {% for ctg in relateds %}
                                     {% if object and object.parent == ctg %}
                                     <option value="{{ ctg.id }}" selected>{{ ctg.name|get_item:lang.code }}</option>
                                     {% elif request_post and request_post|get_item:'parent' == ctg.id %}
