@@ -83,7 +83,7 @@
                             Hex
                         </label>
                         <br>
-                        <input name='hex' type="color" class="form-control"
+                        <input name='hex' type="color"
                         {% if object and object.hex %} value="{{ object.hex }}" 
                         {% elif request_post and request_post|get_item:'hex' %}
                             value="{{ request_post|get_item:'hex'}}" {% endif %}>

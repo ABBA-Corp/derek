@@ -106,13 +106,13 @@ class ProductsList(generics.ListAPIView):
 
 
     def get(self, request, *args, **kwargs):
-        ctg_slug = self.request.GET.get("category")
+        ctg_id = self.request.GET.get("category")
 
-        if ctg_slug is not None:
+        if ctg_id is not None:
             try:
-                Category.objects.get(slug=ctg_slug)
+                Category.objects.get(id=ctg_id)
             except:
-                return Response({'error': 'There is no category with this slug'})
+                return Response({'error': 'There is no category with this ID'})
 
 
         return super().get(request, *args, **kwargs)

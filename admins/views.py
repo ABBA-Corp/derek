@@ -1718,9 +1718,17 @@ class AtributsCreate(CreateView):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
+        options = request.POST.get('options')
+
+        print(options)
+        print(json.loads(options))
+
+        opt_list = [opt.get('value', '') for opt in json.loads(options)]
+
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
+            data['request_post']['options'] = opt_list
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
@@ -1728,20 +1736,55 @@ class AtributsCreate(CreateView):
             atribut = Atributs(**data_dict)
             atribut.full_clean()
             atribut.save()
+
+            lang = Languages.objects.filter(active=True).filter(default=True)
             
-            langs = Languages.objects.filter(active=True)
+            if lang.exists():
+                for opt in options:
+                    opt_name = {lang.first().code: opt.get('value', '')}
 
-            for _ in langs.count():
-                #options = request.POST.get(f'options#{lng.code}')
-                pass#option = AtributOptions.objects.create(atribut=atribut, pass)
-
-
+                    options = AtributOptions.objects.create(atribut=atribut, name=opt_name)
+                    options.save()
         except:
             pass
 
-        
-
         return redirect("home")
+
+
+# atributs edit
+class AtributEdit(UpdateView):
+    model = Atributs
+    fields = '__all__'
+    template_name = 'admin/atributs_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AtributEdit, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+
+        return context
+
+    def form_valid(self, form):
+        return None
+
+    def post(self, request, *args, **kwargs):
+        context = super().post(request, *args, **kwargs)
+        data_dict = serialize_request(self.model, request)
+        data = self.get_context_data()
+
+        if is_valid_field(data_dict, 'name') == False:
+            data['request_post'] = data_dict
+            data['name_error'] = 'This field is required.'
+            return render(request, self.template_name, data)
+
+        instance = self.get_object()
+
+        for attr, value in data_dict.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        return redirect("color_list")
 
 
 # colors
@@ -1761,10 +1804,6 @@ class ColorsCreate(CreateView):
         context = super(ColorsCreate, self).get_context_data(**kwargs)
         context['langs'] = Languages.objects.filter(active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
-
-
-        print(ColorSerializer(Colors.objects.all(), many=True, context={'request': self.request}).data)
-
         return context
 
 
@@ -1786,13 +1825,12 @@ class ColorsCreate(CreateView):
             data['hex_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
-        #try:
-        color = Colors(**data_dict)
-        print(color.slug)
-        color.full_clean()
-        color.save()
-        #except:
-        #    pass
+        try:
+            color = Colors(**data_dict)
+            color.full_clean()
+            color.save()
+        except:
+            pass
 
         return redirect('color_list')
 
@@ -1833,3 +1871,23 @@ class ColorEdit(UpdateView):
         instance.save()
 
         return redirect("color_list")
+
+
+
+# products list
+class ProductsList(BasedListView):
+    model = Products
+    search_fields = ['name']        
+
+
+# products create
+class ProductsCreate(CreateView):
+    model = Products
+    fields = '__all__'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductsCreate, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+
+        return context

@@ -67,26 +67,26 @@
                             {% if object and object.name|get_item:lang.code %} value="{{ object.name|get_item:lang.code }}" 
                             {% elif request_post and request_post|get_item:'name' %}
                                 value="{{ request_post|get_item:'name'|get_item:lang.code }}" {% endif %}>
-                            {% if name_error %}
+                            {% if name_error and lang.default %}
                             <div class="invalid-feedback" style="display: block;">
                                 {{ name_error }}
                             </div>
                             {% endif %}
                         </div>
-
-                        <div class="form-group">
-                            <!-- Label  -->
-                            <label class="form-label">
-                                Опции
-                            </label>
-                            <br>
-                            <input name='options#{{ lang.code }}' class="form-control" value=''>
-                        
-                        </div>
                     </div>
-
-                    
                 {% endfor %}
+                <div class="form-group">
+                    <!-- Label  -->
+                    <label class="form-label">
+                        Опции
+                    </label>
+                    <br>
+                    <input name='options' class="form-control"
+                    {% if object and object.options.all %} value="{% for opt in object.options.all %} {{ opt.name }}, {% endfor %}" 
+                    {% elif request_post and request_post|get_item:'options' %}
+                        value="{% for opt in request_post|get_item:'options' %} {{ opt }}, {% endfor %}" 
+                    {% endif %}>
+                </div>
                 <!-- Buttons -->
             </div>
 
