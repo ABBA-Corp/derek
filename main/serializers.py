@@ -140,7 +140,7 @@ class CategorySimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['name', 'slug']
+        fields = ['name']
 
 
 
