@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
 from .models import Articles, Languages, Translations, TranlsationGroups, StaticInformation, AdminInputs, ArticleCategories, FAQ
-from .models import ImageGalery, VideoGalery, AboutUs, MetaTags, telephone_validator, Reviews, ShortApplication
-from .models import Partners
+from .models import ImageGalery, VideoGalery, AboutUs, MetaTags, telephone_validator, Reviews, ShortApplication, Partners
 from main.models import Products, Category, Atributs, AtributOptions, ProductVariants, Colors
-from .forms import LngForm, UserForm#, ApplicationForm
+from .forms import LngForm, UserForm  # , ApplicationForm
 from django.core.exceptions import ValidationError
 import datetime
 from django.db.models import Q
@@ -13,25 +12,17 @@ from django.apps import apps
 from django.http import JsonResponse, QueryDict, HttpResponseRedirect
 from django.core.files.storage import default_storage
 from .utils import *
-from django.core.paginator import Paginator
 from .serializers import TranslationSerializer
-from rest_framework.response import Response
-from django.urls import reverse_lazy
 from django.contrib.auth.models import User
-#from main.models import CarsModel, CarMarks, States, City, Leads, Applications, ShortApplication
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth import logout
-import os
-from django.conf import settings
-import requests
-from main.serializers import ColorSerializer, AtributOptionsSerializer
-
 # Create your views here.
 
 # based list view
+
+
 class BasedListView(ListView):
     search_fields = list()
-    
+
     def search(self, queryset, fields: list, model, *args, **kwargs):
         query = self.request.GET.get("q", '')
 
@@ -64,8 +55,10 @@ class BasedListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(BasedListView, self).get_context_data(**kwargs)
 
-        context['objects'] = get_lst_data(self.get_queryset(), self.request, 20)
-        context['lang'] = Languages.objects.filter(active=True).filter(default=True).first()
+        context['objects'] = get_lst_data(
+            self.get_queryset(), self.request, 20)
+        context['lang'] = Languages.objects.filter(
+            active=True).filter(default=True).first()
         context['page_obj'] = paginate(self.get_queryset(), self.request, 20)
         context['url'] = search_pagination(self.request)
 
@@ -73,46 +66,32 @@ class BasedListView(ListView):
 
 
 # based create view
-class BasedFormView(CreateView):
+class BasedCreateView(CreateView):
     related_model = None
     related_model_varb_name = None
     fields = '__all__'
-    create = False
-    update = False
 
     def get_context_data(self, **kwargs):
-        context = super(BasedFormView, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context = super(BasedCreateView, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
         context['fields'] = get_model_fields(self.model)
 
         if self.related_model is not None:
             context['relateds'] = self.related_model.objects.order_by('-id')
-    
+
         context['dropzone_key'] = self.model._meta.verbose_name
+        context['images'] = []
 
-        if self.create:
-            context['images'] = []
-
-            if self.request.session.get(context['dropzone_key']):
-                context['images'] = list({'name': it['name'], 'id': clean_text(
-                    it['name'])} for it in self.request.session[context['dropzone_key']] if it['id'] == '')
+        if self.request.session.get(context['dropzone_key']):
+            context['images'] = list({'name': it['name'], 'id': clean_text(
+                it['name'])} for it in self.request.session[context['dropzone_key']] if it['id'] == '')
 
         return context
 
     def form_valid(self, form):
         return None
-
-    
-    def get_request_dict(self):
-        if self.request.method == 'POST':
-            data_dict = serialize_request(self.model, self.request)
-            return data_dict
-        else:
-            return None
-
-    
-
 
 
 # home admin
@@ -237,7 +216,7 @@ def del_statics_image(request):
             model.logo_second.delete()
         elif key == 'cotalog':
             model.cotalog.delete()
-        
+
         model.save()
     except:
         pass
@@ -261,17 +240,17 @@ def delete_image(request):
 
 
 # articles create
-class ArticleCreateView(BasedFormView):
+class ArticleCreateView(BasedCreateView):
     model = Articles
     template_name = 'admin/new_article.html'
     success_url = 'articles_list'
     related_model = ArticleCategories
-    create = True
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
-        data_dict['created_date'] = data_dict.get('created_date', str(datetime.date.today()))
+        data_dict['created_date'] = data_dict.get(
+            'created_date', str(datetime.date.today()))
         data_dict['author'] = request.user
         key = request.POST.get('dropzone-key')
         categories = request.POST.getlist('categories[]')
@@ -288,7 +267,8 @@ class ArticleCreateView(BasedFormView):
             article.full_clean()
             article.save()
             if categories:
-                ctg_queryset = [ArticleCategories.objects.get(id=int(it)) for it in categories]
+                ctg_queryset = [ArticleCategories.objects.get(
+                    id=int(it)) for it in categories]
                 article.category.set(ctg_queryset)
 
             key = self.model._meta.verbose_name
@@ -329,19 +309,6 @@ class ArticlesList(BasedListView):
     search_fields = ['title', 'body']
 
 
-# delete article
-def del_article(request):
-    id = request.POST.get('id')
-    url = request.POST.get("url")
-
-    try:
-        Articles.objects.get(id=int(id)).delete()
-    except:
-        pass
-
-    return redirect(url)
-
-
 # article update
 class ArticleUpdate(UpdateView):
     model = Articles
@@ -351,12 +318,12 @@ class ArticleUpdate(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(ArticleUpdate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
         context['fields'] = get_model_fields(self.model)
         context['relateds'] = ArticleCategories.objects.order_by('-id')
         context['dropzone_key'] = self.model._meta.verbose_name
-
 
         return context
 
@@ -563,98 +530,6 @@ def class_list():
     my_app_models = [apps.all_models[name] for name in my_apps]
     return my_app_models
 
-# form setting
-
-
-class FormSettings(UpdateView):
-    model = AdminInputs
-    template_name = 'admin/form_settings.html'
-    fields = "__all__"
-
-    def get_object(self):
-        try:
-            object = AdminInputs.objects.get(id=1)
-        except:
-            object = AdminInputs().save()
-
-        return object
-
-    def get_context_data(self, **kwargs):
-        context = super(FormSettings, self).get_context_data(**kwargs)
-        models = class_list()
-
-        context['models'] = []
-
-        for model in models:
-            for key in model:
-                if model[key]._meta.verbose_name.title() != 'Admin Inputs':
-                    data = {}
-                    data['title'] = model[key].__name__
-                    data['name'] = model[key]._meta.verbose_name.title()
-                    data['fields'] = []
-
-                    for field in model[key]._meta.get_fields():
-                        if field.name != 'id':
-                            data['fields'].append(field.name)
-
-                    context['models'].append(data)
-
-        settings_fields = {}
-        try:
-            for key in self.get_object().inputs:
-                data_list = []
-                for item in self.get_object().inputs[key]:
-                    data_list.append(item['field'])
-
-                settings_fields[key] = data_list
-        except:
-            pass
-
-        context['set_fields'] = settings_fields
-        print(context['set_fields'])
-
-        return context
-
-    def post(self, request, *args, **kwargs):
-        request_data = []
-        settings = self.get_object()
-
-        for key in request.POST:
-            try:
-                data = {}
-                data['key'] = json.loads(str(key))
-                data['value'] = request.POST[key]
-                request_data.append(data)
-            except:
-                pass
-
-        boolens = []
-        for data in request_data:
-            if data['key']['type'] == 'bool':
-                data_tuple = (data['key']['model'], data['key']['field'])
-                boolens.append(data_tuple)
-
-        final_data = {}
-        for data in request_data:
-            model_name = data['key']['model']
-            field = data['key']['field']
-
-            if (model_name, field) in boolens and data['key']['type'] == 'label':
-
-                final_data[model_name] = final_data.get(model_name, [])
-
-                data_dict = {
-                    'field': data['key']['field'],
-                    'label': data['value']
-                }
-                final_data[model_name].append(data_dict)
-
-        print(final_data)
-        settings.inputs = final_data
-        settings.save()
-
-        return redirect(request.META.get("HTTP_REFERER"))
-
 
 # translations list
 class TranslationList(ListView):
@@ -671,11 +546,13 @@ class TranslationList(ListView):
     def get_context_data(self, **kwargs):
         context = super(TranslationList, self).get_context_data(**kwargs)
         context['groups'] = TranlsationGroups.objects.all()
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
         context['url'] = search_pagination(self.request)
 
         # pagination
-        context['translations'] = get_lst_data(self.get_queryset(), self.request, 20)
+        context['translations'] = get_lst_data(
+            self.get_queryset(), self.request, 20)
         context['page_obj'] = paginate(self.get_queryset(), self.request, 20)
 
         return context
@@ -749,18 +626,6 @@ def translation_update(request):
         serializer = TranslationSerializer(translation)
 
         return JsonResponse(serializer.data)
-
-
-# translations delete
-def delete_translation(request):
-    id = request.POST.get("id")
-    url = request.POST.get("url")
-    try:
-        Translations.objects.get(id=int(id)).delete()
-    except:
-        return JsonResponse({'error': 'Id is invalid'})
-
-    return redirect(url)
 
 
 # add translation group
@@ -897,26 +762,12 @@ class ArticleCtgList(BasedListView):
 
 
 # add article ctg
-class AddArticleCtg(CreateView):
+class AddArticleCtg(BasedCreateView):
     model = ArticleCategories
     template_name = 'admin/article_ctg_form.html'
     fields = '__all__'
     success_url = 'article_ctg_list'
-
-    def get_context_data(self, **kwargs):
-        context = super(AddArticleCtg, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
-        context['categories'] = ArticleCategories.objects.order_by('-id')
-        context['fields'] = get_model_fields(self.model)
-        context['lang'] = Languages.objects.filter(active=True).filter(default=True).first()
-        context['dropzone_key'] = self.model._meta.verbose_name
-        context['images'] = []
-
-        if self.request.session.get(context['dropzone_key']):
-            context['images'] = list({'name': it['name'], 'id': clean_text(
-                it['name'])} for it in self.request.session[context['dropzone_key']] if it['id'] == '')
-
-        return context
+    related_model = ArticleCategories
 
     def form_valid(self, form):
         return None
@@ -924,7 +775,6 @@ class AddArticleCtg(CreateView):
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
-        parent = request.POST.get('parent')
 
         data = self.get_context_data()
         try:
@@ -972,9 +822,8 @@ class ArticleCtgEdit(UpdateView):
         context = super(ArticleCtgEdit, self).get_context_data(**kwargs)
         context['langs'] = Languages.objects.filter(
             active=True).order_by('-default')
-        context['categories'] = ArticleCategories.objects.exclude(
+        context['relateds'] = ArticleCategories.objects.exclude(
             id=self.get_object().id).order_by('-id')
-        context['fields'] = get_model_fields(self.model)
         context['lang'] = Languages.objects.filter(
             active=True).filter(default=True).first()
         context['dropzone_key'] = self.model._meta.verbose_name
@@ -1027,68 +876,9 @@ class ArticleCtgEdit(UpdateView):
 
         return redirect('article_ctg_list')
 
-
-# article category delete
-def article_ctg_del(request):
-    try:
-        ArticleCategories.objects.get(id=request.POST.get("id")).delete()
-    except:
-        pass
-
-    return redirect(request.POST.get("url"))
-
-
-# faq list
-class FAQlist(BasedListView):
-    model = FAQ
-    paginate_by = 100
-
-
-
-# faq create
-class FAQcreate(CreateView):
-    model = FAQ
-    fields = '__all__'
-
-    def get_context_data(self, **kwargs):
-        context = super(FAQcreate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(
-            active=True).order_by('-default')
-
-        return context
-
-    def post(self, request, *args, **kwargs):
-        data_dict = serialize_request(self.model, request)
-        faq = FAQ(**data_dict)
-        faq.save()
-
-        return redirect('/')
-
-
-# faq update
-class FAQupdate(UpdateView):
-    model = FAQ
-    fields = '__all__'
-
-    def get_context_data(self, **kwargs):
-        context = super(FAQupdate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(
-            active=True).order_by('-default')
-
-        return context
-
-    def post(self, request, *args, **kwargs):
-        data_dict = serialize_request(self.model, request)
-        instance = self.get_object()
-
-        for attr, value in data_dict.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        return redirect(request.META.get("HTTP_REFERER"))
-
-
 # delete about us video
+
+
 def delete_about_video(request):
     try:
         model = AboutUs.objects.get(id=1)
@@ -1114,6 +904,8 @@ def set_about_video(request):
     return JsonResponse('success', safe=False)
 
 # super users list
+
+
 class AdminsList(BasedListView):
     model = User
     template_name = 'admin/moterators_list.html'
@@ -1192,22 +984,10 @@ def delete_article_image(request):
     return JsonResponse('success', safe=False)
 
 
-def delete_translation_group(request):
-    pk = request.POST.get("pk")
-
-    try:
-        TranlsationGroups.objects.get(pk=int(pk)).delete()
-    except:
-        pass
-
-    return redirect('translation_list')
-
-
 # quic applications
 class ShortApplicationList(BasedListView):
     model = ShortApplication
     template_name = 'admin/short_apls.html'
-
 
 
 # short application update
@@ -1218,7 +998,8 @@ class ShortApplicationUpdate(UpdateView):
     success_url = '/admin/quick_applications'
 
     def get_context_data(self, **kwargs):
-        context = super(ShortApplicationUpdate, self).get_context_data(**kwargs)
+        context = super(ShortApplicationUpdate,
+                        self).get_context_data(**kwargs)
         context['statuses'] = ["На рассмотрении", "Рассмотрено", "Отклонено"]
 
         return context
@@ -1232,41 +1013,22 @@ class ReviewsList(BasedListView):
 
 
 # reviews crete
-class ReviewsCreate(CreateView):
+class ReviewsCreate(BasedCreateView):
     model = Reviews
     fields = '__all__'
-
     template_name = 'admin/reviews_form.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ReviewsCreate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
-        context['lang'] = Languages.objects.filter(default=True).first()
-        context['dropzone_key'] = self.model._meta.verbose_name
-        context['images'] = []
-
-        if self.request.session.get(context['dropzone_key']):
-            context['images'] = list({'name': it['name'], 'id': clean_text(str(it['name']))} for it in self.request.session[context['dropzone_key']] if it['id'] == '')
-
-        return context
-
-    def form_valid(self, form):
-        return None
 
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
+        req_fields = ['title', 'text']
 
-        if is_valid_field(data_dict, 'title') == False:
-            data['request_post'] = data_dict
-            data['title_error'] = 'This field is required.'
-            return render(request, self.template_name, data)
-
-        if is_valid_field(data_dict, 'text') == False:
-            data['request_post'] = data_dict
-            data['text_error'] = 'This field is required.'
-            return render(request, self.template_name, data)
+        for field in req_fields:
+            if is_valid_field(data_dict, field) == False:
+                data['request_post'] = data_dict
+                data[f'{field}_error'] = 'This field is required.'
+                return render(request, self.template_name, data)
 
         rating = data_dict.get('rating', 0)
         if type(rating) == float or int(rating) < 0 or int(rating) > 5:
@@ -1283,7 +1045,8 @@ class ReviewsCreate(CreateView):
             sess_images = request.session.get(key)
 
             if sess_images and len([it for it in request.session.get(key) if it['id'] == '']) > 0:
-                image = [it for it in request.session.get(key) if it['id'] == ''][0]
+                image = [it for it in request.session.get(
+                    key) if it['id'] == ''][0]
 
                 review.image = image['name']
                 review.save()
@@ -1303,7 +1066,8 @@ class ReviewsUpdate(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(ReviewsUpdate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
         context['dropzone_key'] = self.model._meta.verbose_name
         return context
 
@@ -1333,12 +1097,13 @@ class ReviewsUpdate(UpdateView):
 
         instance = self.get_object()
         key = self.model._meta.verbose_name
-    
+
         for attr, value in data_dict.items():
             setattr(instance, attr, value)
 
         try:
-            file = [it for it in request.session.get(key, []) if it['id'] == str(self.get_object().id)][0]
+            file = [it for it in request.session.get(
+                key, []) if it['id'] == str(self.get_object().id)][0]
         except:
             file = None
 
@@ -1351,7 +1116,7 @@ class ReviewsUpdate(UpdateView):
                         request.session.modified = True
                     except:
                         pass
-        
+
         instance.save()
 
         return redirect("review_list")
@@ -1383,27 +1148,11 @@ class PartnersList(BasedListView):
     search_fields = ['name']
 
 
-
 # partners create
-class PartnersCreate(CreateView):
+class PartnersCreate(BasedCreateView):
     model = Partners
     fields = "__all__"
     template_name = 'admin/partners_form.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(PartnersCreate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
-        context['lang'] = Languages.objects.filter(default=True).first()
-        context['dropzone_key'] = self.model._meta.verbose_name
-        context['images'] = []
-
-        if self.request.session.get(context['dropzone_key']):
-            context['images'] = list({'name': it['name'], 'id': clean_text(str(it['name']))} for it in self.request.session[context['dropzone_key']] if it['id'] == '')
-
-        return context
-
-    def form_valid(self, form):
-        return None
 
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
@@ -1437,7 +1186,6 @@ class PartnersCreate(CreateView):
         return redirect('partners_list')
 
 
-
 # pertners eidt
 class PartnersEdit(UpdateView):
     model = Partners
@@ -1446,7 +1194,8 @@ class PartnersEdit(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(PartnersEdit, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
         context['dropzone_key'] = self.model._meta.verbose_name
 
@@ -1472,7 +1221,8 @@ class PartnersEdit(UpdateView):
             setattr(instance, attr, value)
 
         try:
-            file = [it for it in request.session.get(key, []) if it['id'] == str(self.get_object().id)][0]
+            file = [it for it in request.session.get(
+                key, []) if it['id'] == str(self.get_object().id)][0]
         except:
             file = None
 
@@ -1491,27 +1241,22 @@ class PartnersEdit(UpdateView):
         return redirect("partners_list")
 
 
-
 # category list
 class CategoryList(BasedListView):
     model = Category
     search_fields = ['name']
     template_name = 'admin/category_list.html'
-    
+
 
 # category create
-class CategoryCreate(CreateView):
+class CategoryCreate(BasedCreateView):
     model = Category
     fields = '__all__'
     template_name = 'admin/category_form.html'
+    related_model = Atributs
 
     def get_context_data(self, **kwargs):
-        context = super(CategoryCreate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
-        context['lang'] = Languages.objects.filter(default=True).first()
-        context['dropzone_key'] = self.model._meta.verbose_name
-        context['atributs'] = Atributs.objects.all()
-        context['images'] = []
+        context = super().get_context_data(**kwargs)
 
         if self.request.session.get(f"{context['dropzone_key']}_image"):
             context['images'] = list({'name': it['name'], 'id': clean_text(str(
@@ -1522,9 +1267,6 @@ class CategoryCreate(CreateView):
                 it['name']))} for it in self.request.session[f"{context['dropzone_key']}_icon"] if it['id'] == '')
 
         return context
-
-    def form_valid(self, form):
-        return None
 
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
@@ -1548,7 +1290,8 @@ class CategoryCreate(CreateView):
 
             if atributs:
                 try:
-                    atr_list = [Atributs.objects.get(id=int(it)) for it in atributs]
+                    atr_list = [Atributs.objects.get(
+                        id=int(it)) for it in atributs]
                     category.atributs.set(atr_list)
                 except:
                     pass
@@ -1577,14 +1320,13 @@ class CategoryCreate(CreateView):
                 request.session.get(f'{key}_icon').remove(icon)
                 request.session.modified = True
 
-            category.save()            
+            category.save()
         except:
             data['request_post'] = data_dict
             data['some_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
         return redirect('category_list')
-
 
 
 # category edit
@@ -1595,10 +1337,11 @@ class CategoryEdit(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(CategoryEdit, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
         context['dropzone_key'] = self.model._meta.verbose_name
-        context['atributs'] = Atributs.objects.all()
+        context['relateds'] = Atributs.objects.all()
 
         return context
 
@@ -1625,21 +1368,24 @@ class CategoryEdit(UpdateView):
 
         if cotalog:
             instance.cotalog = cotalog
-        
+
         if atributs:
             try:
-                atr_list = [Atributs.objects.get(id=int(it)) for it in atributs]
+                atr_list = [Atributs.objects.get(
+                    id=int(it)) for it in atributs]
                 instance.atributs.set(atr_list)
             except:
                 pass
 
         try:
-            images = [it for it in request.session.get(f'{key}_image', []) if it['id'] == str(self.get_object().id)][0]
+            images = [it for it in request.session.get(
+                f'{key}_image', []) if it['id'] == str(self.get_object().id)][0]
         except:
             images = None
 
         try:
-            icons = [it for it in request.session.get(f'{key}_icon', []) if it['id'] == str(self.get_object().id)][0]
+            icons = [it for it in request.session.get(
+                f'{key}_icon', []) if it['id'] == str(self.get_object().id)][0]
         except:
             icons = None
 
@@ -1695,7 +1441,6 @@ class AtributsList(BasedListView):
     search_fields = ['name']
     template_name = 'admin/atributs.html'
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -1705,33 +1450,17 @@ class AtributsList(BasedListView):
 
 
 # atributs create
-class AtributsCreate(CreateView):
+class AtributsCreate(BasedCreateView):
     model = Atributs
     fields = '__all__'
     template_name = 'admin/atributs_form.html'
-
-    
-    def get_context_data(self, **kwargs):
-        context = super(AtributsCreate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
-        context['lang'] = Languages.objects.filter(default=True).first()
-
-        return context
-
-    
-    def form_valid(self, form):
-        return None
 
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
         options = json.loads(request.POST.get('options', "[]"))
-
-        print(options)
-
         opt_list = [opt.get('value', '') for opt in options]
-
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
@@ -1745,12 +1474,13 @@ class AtributsCreate(CreateView):
             atribut.save()
 
             lang = Languages.objects.filter(active=True).filter(default=True)
-            
+
             if lang.exists():
                 for opt in options:
                     opt_name = {lang.first().code: opt.get('value', '')}
 
-                    options = AtributOptions.objects.create(atribut=atribut, name=opt_name)
+                    options = AtributOptions.objects.create(
+                        atribut=atribut, name=opt_name)
                     options.save()
         except:
             pass
@@ -1766,7 +1496,8 @@ class AtributEdit(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(AtributEdit, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
 
         return context
@@ -1806,7 +1537,7 @@ def get_option(request):
 
     data = {}
     data['id'] = option.id
-    
+
     for lang in Languages.objects.filter(active=True):
         data[lang.code] = option.name.get(lang.code, '')
 
@@ -1837,15 +1568,13 @@ class AtributOptionEdit(UpdateView):
 
         instance = self.get_object()
 
-        for attr, value in data_dict.items():
-            setattr(instance, attr, value)
+        if instance:
+            for attr, value in data_dict.items():
+                setattr(instance, attr, value)
 
         instance.save()
 
-
         return JsonResponse('success', safe=False)
-
-
 
 
 # colors
@@ -1856,20 +1585,10 @@ class ColorsList(BasedListView):
 
 
 # colors create
-class ColorsCreate(CreateView):
+class ColorsCreate(BasedCreateView):
     model = Colors
     fields = '__all__'
     template_name = 'admin/colors_form.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ColorsCreate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
-        context['lang'] = Languages.objects.filter(default=True).first()
-        return context
-
-
-    def form_valid(self, form):
-        return None
 
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
@@ -1894,7 +1613,6 @@ class ColorsCreate(CreateView):
             pass
 
         return redirect('color_list')
-
 
 
 # color edit
@@ -1934,11 +1652,75 @@ class ColorEdit(UpdateView):
         return redirect("color_list")
 
 
-
 # products list
 class ProductsList(BasedListView):
     model = Products
-    search_fields = ['name']        
+    search_fields = ['name']
+
+
+# checkbox to boolean
+CHECKBOX_MAPPING = {'on': True, 'off': False}
+
+
+# get variants data
+def get_variant_dict(request, i, data, template_name, product):
+    data_dict = {}
+    data_dict['price'] = request.POST.get(f'price[{i}]')
+
+    if data_dict['price'] is None or 0 > float(data_dict['price']):
+        data['request_post'] = data_dict
+        data['price_error'] = {}
+        data['price_error']['error'] = 'This field is required and should be frreater than 0'
+        data['price_error']['item'] = i
+        return render(request, template_name, data)
+
+    data_dict['code'] = request.POST.get('code')
+    if data_dict['code'] is None:
+        data['request_post'] = data_dict
+        data['code_error'] = {}
+        data['code_error']['error'] = 'This field is required'
+        data['code_error']['item'] = i
+        return render(request, template_name, data)
+
+    option_ids = request.POST.getlist(f'options[{i}]')
+    if len(option_ids) != product.category.atributs.count():
+        data['request_post'] = data_dict
+        data['options_error'] = {}
+        data['options_error']['error'] = 'Choosen options count is invalid.'
+        data['options_error']['item'] = i
+        return render(request, template_name, data)
+
+    data_dict['options'] = []
+    for it in option_ids:
+        try:
+            data_dict['options'].append(AtributOptions.objects.get(id=int(it)))
+        except:
+            pass
+
+    color_id = request.POST.get(f'variant_color[{i}]')
+
+    color = Colors.objects.filter(id=int(color_id))
+
+    if color.exists() is False:
+        data['request_post'] = data_dict
+        data['color_error'] = {}
+        data['color_error']['error'] = 'Choosen color is invalid.'
+        data['color_error']['item'] = i
+        return render(request, template_name, data)
+    else:
+        data_dict['color'] = color.first()
+
+    image = request.FILES.get(f'image[{i}]')
+    if image:
+        data_dict['image'] = image
+
+    top_val = request.POST.get('top', 'off')
+    data_dict['top'] = CHECKBOX_MAPPING.get(top_val)
+
+    default_val = request.POST.get('default', 'off')
+    data_dict['default'] = CHECKBOX_MAPPING.get(default_val)
+
+    return data_dict
 
 
 # products create
@@ -1948,7 +1730,8 @@ class ProductsCreate(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductsCreate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
 
         return context
@@ -1956,16 +1739,115 @@ class ProductsCreate(CreateView):
     def form_valid(self, form):
         return None
 
-    
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
-        data = self.get_context_data()
+        category_id = request.POST.get('category')
 
+        data = self.get_context_data()
+        variants_count = request.POST.get('variant_count')
+
+        category = Category.objects.filter(id=int(category_id))
+        if category.exists():
+            data_dict['category'] = category.first()
+        else:
+            data['request_post'] = data_dict
+            data['name_error'] = 'This field is invalid.'
+            return render(request, self.template_name, data)
+
+        if variants_count is None:
+            data['request_post'] = data_dict
+            return render(request, self.template_name, data)
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)
-        
-        
+
+        try:
+            product = Products(**data_dict)
+            product.full_clean()
+            product.save()
+
+            for i in range(1, int(variants_count)+1):
+                variant_dict = get_variant_dict(
+                    request, i, data, self.template_name, product)
+                variant_dict['product'] = product
+                options = variant_dict.pop('options')
+
+                variant = ProductVariants.objects.create(**variant_dict)
+                variant.options.set(options)
+                if variant.full_clean():
+                    variant.save()
+                else:
+                    print(variant.full_clean())
+        except:
+            pass
+
+            return redirect('home')
+
+
+# products edit
+class ProductEdit(UpdateView):
+    model = Products
+    fields = '__all__'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductEdit, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+
+        return context
+
+    def form_valid(self, form):
+        return None
+
+    def post(self, request, *args, **kwargs):
+        context = super().post(request, *args, **kwargs)
+        data_dict = serialize_request(self.model, request)
+        data = self.get_context_data()
+        instance = self.get_object()
+        category_id = request.POST.get('category')
+        category = Category.objects.filter(id=int(category_id))
+        if category.exists():
+            data_dict['category'] = category.first()
+        else:
+            data['request_post'] = data_dict
+            data['name_error'] = 'This field is invalid.'
+            return render(request, self.template_name, data)
+
+        items_count = int(request.POST.get('variant_count', 0))
+        old_count = instance.variants.count()
+        new_items_count = old_count - items_count
+
+        for attr, value in data_dict.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        for i in range(1, old_count+1):
+            variant = instance.variant[i]
+            variant_dict = get_variant_dict(
+                request, i, data, self.template_name, instance)
+            options = variant_dict.pop('options')
+
+            for attr, value in variant_dict.items():
+                setattr(variant, attr, value)
+            variant.options.set(options)
+            if variant.full_clean():
+                variant.save()
+            else:
+                print(variant.full_clean())
+
+        for l in range(old_count+1, new_items_count + 1):
+            variant_dict = get_variant_dict(
+                request, l, data, self.template_name, instance)
+            variant_dict['product'] = instance
+            options = variant_dict.pop('options')
+
+            variant = ProductVariants.objects.create(**variant_dict)
+            variant.options.set(options)
+            if variant.full_clean():
+                variant.save()
+            else:
+                print(variant.full_clean())
