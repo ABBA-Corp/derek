@@ -75,6 +75,7 @@
                         </div>
                     </div>
                 {% endfor %}
+                {% if not object %}
                 <div class="form-group">
                     <!-- Label  -->
                     <label class="form-label">
@@ -88,6 +89,7 @@
                     {% endif %}>
                 </div>
                 <!-- Buttons -->
+                {% endif %}
             </div>
 
 

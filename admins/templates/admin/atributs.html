@@ -88,8 +88,9 @@
                     </td>
                     <td>
                         <ul>
-                            {% for opt in object.options.all %}
-                                <li>{{ opt.name|get_item:lang.code }}</li>
+                            {% for opt in obj.options.all %}
+                                <li class="atribut_options" data-id="{{ opt.id }}" data-get="{% url 'get_atr_option' %}" style="cursor: pointer;" data-bs-toggle="modal"
+                                data-bs-target="#atributOptionModal">{{ opt.name|get_item:lang.code }}</li>
                             {% endfor %}
                         </ul>
                     </td>
@@ -115,6 +116,45 @@
             </tbody>
         </table>
     </div>
+
+    <div class="modal fade" id="atributOptionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="modal-content" id="option-edit-form" method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id">
+                    {% for lang in langs %}
+                    <div class="form-group">
+                        <!-- Label  -->
+                        <label class="form-label">
+                            Значение({{ lang.code }})
+                        </label>
+                        <br>
+                        <!-- Input -->
+                        <input type="text" name="name#{{ lang.code }}" class="form-control"
+                            placeholder="{{ lang.code }}..." required>
+                        {% if lang.default %}
+                        <div class="invalid-feedback" id="option_name_error">
+    
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
     <div class="card-footer d-flex justify-content-between">
 
         <!-- Pagination (prev) -->
@@ -179,15 +219,13 @@
 
             <!-- Close -->
             <button type="button" class="list-alert-close btn-close" aria-label="Close"></button>
-
         </div>
-
     </div>
 </div>
 
 
 <!-- JAVASCRIPT -->
-
+<script src="{% static 'assets/js/atribut_option_edit.js' %}"></script>
 <!-- Map JS -->
 
 <!-- Vendor JS -->

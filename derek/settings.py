@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'derek.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-TEST_DOMEN = True
+TEST_DOMEN = False
 
 
 if TEST_DOMEN:

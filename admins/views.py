@@ -24,7 +24,7 @@ from django.contrib.auth import logout
 import os
 from django.conf import settings
 import requests
-from main.serializers import ColorSerializer
+from main.serializers import ColorSerializer, AtributOptionsSerializer
 
 # Create your views here.
 
@@ -1696,6 +1696,14 @@ class AtributsList(BasedListView):
     template_name = 'admin/atributs.html'
 
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['langs'] = Languages.objects.filter(active=True)
+
+        return context
+
+
 # atributs create
 class AtributsCreate(CreateView):
     model = Atributs
@@ -1718,12 +1726,11 @@ class AtributsCreate(CreateView):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
-        options = request.POST.get('options')
+        options = json.loads(request.POST.get('options', "[]"))
 
         print(options)
-        print(json.loads(options))
 
-        opt_list = [opt.get('value', '') for opt in json.loads(options)]
+        opt_list = [opt.get('value', '') for opt in options]
 
 
         if is_valid_field(data_dict, 'name') == False:
@@ -1748,7 +1755,7 @@ class AtributsCreate(CreateView):
         except:
             pass
 
-        return redirect("home")
+        return redirect("atr_list")
 
 
 # atributs edit
@@ -1771,6 +1778,7 @@ class AtributEdit(UpdateView):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
+        #options = json.loads(request.POST.get('options', "[]"))
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
@@ -1784,7 +1792,60 @@ class AtributEdit(UpdateView):
 
         instance.save()
 
-        return redirect("color_list")
+        return redirect("atr_list")
+
+
+# get option
+def get_option(request):
+    if request.method == 'GET':
+        id = request.GET.get('id')
+        try:
+            option = AtributOptions.objects.get(id=int(id))
+        except:
+            return JsonResponse({'error': 'id is invalid'})
+
+    data = {}
+    data['id'] = option.id
+    
+    for lang in Languages.objects.filter(active=True):
+        data[lang.code] = option.name.get(lang.code, '')
+
+    return JsonResponse(data)
+
+
+# atribut options edit
+class AtributOptionEdit(UpdateView):
+    model = AtributOptions
+    fields = '__all__'
+
+    def get_object(self, queryset):
+        try:
+            id = self.request.GET.get("id")
+            return queryset.get(id=int(id))
+        except:
+            return None
+
+    def form_valid(self, form):
+        return None
+
+    def post(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
+        data_dict = serialize_request(self.model, request)
+
+        if is_valid_field(data_dict, 'name') == False:
+            return JsonResponse({'error': 'Name is required'})
+
+        instance = self.get_object()
+
+        for attr, value in data_dict.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+
+        return JsonResponse('success', safe=False)
+
+
 
 
 # colors
