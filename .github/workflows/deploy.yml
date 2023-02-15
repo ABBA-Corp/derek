@@ -1,0 +1,44 @@
+name: Production Django deploy Derek
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: GIT pulling from github repository
+      uses: appleboy/scp-action@master
+      env:
+        HOST: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      with:
+        source: "."
+        target: "/home/backend/derek"
+
+    - name: Command using from script
+      uses: appleboy/ssh-action@master
+      env:
+        DJANGO_SETTINGS_MODULE: "matelog.production"
+      with:
+        host: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        envs: DJANGO_SETTINGS_MODULE
+        script_stop: true
+        script: |
+          git --work-tree=/home/backend/derek --git-dir=/home/backend/derek/.git clean -f .
+          /home/backend/derek/venv/bin/pip install -r /home/backend/derek/production.txt
+          /home/backend/derek/venv/bin/python /home/backend/derek/manage_prod.py collectstatic --no-input
+          /home/backend/derek/venv/bin/python /home/backend/derek/manage_prod.py migrate
+          systemctl restart derek.service
+          sh /home/devops/derek_back.sh "${{ github.event.head_commit.message }}"
