@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import StaticInformation, ImageGalery, VideoGalery, TranlsationGroups, Articles, Languages, Translations, FAQ, AdminInputs, ArticleCategories, MetaTags, Reviews
+from .models import StaticInformation, ImageGalery, VideoGalery, TranlsationGroups, Articles, Languages, Translations, FAQ, AdminInputs, ArticleCategories, MetaTags, Reviews, Partners
 from django.contrib.auth.models import Permission
 # Register your models here.
 

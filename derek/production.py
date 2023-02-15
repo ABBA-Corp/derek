@@ -164,4 +164,3 @@ REST_FRAMEWORK = {
 #REST_FRAMEWORK = {"DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",)} # noqa F405
 TIME_ZONE = "Asia/Tashkent"
 LANGUAGE_CODE = 'ru-RU'
-CSRF_TRUSTED_ORIGINS = ['https://ba06-31-148-161-224.eu.ngrok.io'] # TODO: CHANGE 

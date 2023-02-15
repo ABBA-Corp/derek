@@ -239,13 +239,6 @@ class AboutUsImages(models.Model):
     parent = models.ForeignKey(AboutUs, on_delete=models.CASCADE, related_name='images', blank=True, null=True)
     image = ThumbnailerImageField(upload_to='about_us_images', blank=True, null=True)
 
-
-# parntners
-class Partners(models.Model):
-    title = models.JSONField('Title', blank=True, null=True)
-    image = ThumbnailerImageField(upload_to='partner_images', blank=True, null=True)
-
-
 # reviews
 class Reviews(models.Model):
     image = ThumbnailerImageField(upload_to='rev_image', blank=True, null=True)
