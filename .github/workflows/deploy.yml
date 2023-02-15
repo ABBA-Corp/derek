@@ -37,7 +37,7 @@ jobs:
         script_stop: true
         script: |
           git --work-tree=/home/backend/derek --git-dir=/home/backend/derek/.git clean -f .
-          /home/backend/derek/venv/bin/pip install -r /home/backend/derek/production.txt
+          /home/backend/derek/venv/bin/pip install -r /home/backend/derek/requirements.txt
           /home/backend/derek/venv/bin/python /home/backend/derek/manage_prod.py collectstatic --no-input
           /home/backend/derek/venv/bin/python /home/backend/derek/manage_prod.py migrate
           systemctl restart derek.service
