@@ -26,8 +26,10 @@ def search_func(q, field, queryset, fields, image_fields, request, product=False
             dct = item.__dict__
             if product:
                 src_field = item.product.__dict__.get(field).get(lang.code)
-                dct['name'] = item.product.name.get(lang.code, None)
-                dct['description'] = item.product.description.get(lang.code, None)
+                if item.product.description:
+                    dct['name'] = item.product.name.get(lang.code, None)
+                if item.product.description:
+                    dct['description'] = item.product.description.get(lang.code, None)
             else:
                 src_field = item.__dict__.get(field).get(lang.code)
                 
