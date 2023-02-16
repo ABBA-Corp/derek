@@ -15,6 +15,7 @@ from .utils import *
 from .serializers import TranslationSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
+from main.serializers import AtributSerializer
 # Create your views here.
 
 # based list view
@@ -488,8 +489,7 @@ class StaticUpdate(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(StaticUpdate, self).get_context_data(**kwargs)
-        context['langs'] = Languages.objects.filter(
-            active=True).order_by('-default')
+        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
         context['dropzone_key'] = self.model._meta.verbose_name
 
         return context
@@ -1851,3 +1851,17 @@ class ProductEdit(UpdateView):
                 variant.save()
             else:
                 print(variant.full_clean())
+
+
+# get category atributs
+def get_ctg_atributs(request):
+    id = request.GET.get('id')
+    try:
+        category = Category.objects.get(id=int(id))
+    except:
+        return JsonResponse({'error': 'Category id is invalid'})
+
+    atributs = category.atributs.all()
+    serializer = AtributSerializer(atributs, many=True, context={'request': request})
+
+    return JsonResponse(serializer.data)

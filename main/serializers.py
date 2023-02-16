@@ -1,7 +1,10 @@
 from .models import Products, Atributs, AtributOptions, Category, Colors, ProductVariants
 from admins.models import Languages
 from rest_framework import serializers
-from easy_thumbnails.templatetags.thumbnail import thumbnail_url
+from django.conf import settings
+from django.core.files.storage import default_storage
+import os
+from easy_thumbnails.templatetags.thumbnail import thumbnail_url, get_thumbnailer
 from admins.models import Articles, StaticInformation, AboutUs, Languages, Translations, MetaTags, Reviews, Partners, ShortApplication
 
 
@@ -11,9 +14,25 @@ class ThumbnailSerializer(serializers.BaseSerializer):
         self.alias = alias
 
     def to_representation(self, instance):
-        url = thumbnail_url(instance, self.alias)
+        alias = settings.THUMBNAIL_ALIASES.get('').get(self.alias)
+        if alias is None:
+            return None
 
-        if url == '':
+        size = alias.get('size')[0]
+        url = None
+
+        if instance:
+            orig_url = instance.path.split('.')
+            thb_url = '.'.join(orig_url) + f'.{size}x{size}_q85.{orig_url[-1]}'
+            if default_storage.exists(thb_url):
+                print("if")
+                last_url = instance.url.split('.')
+                url = '.'.join( last_url) + f'.{size}x{size}_q85.{last_url[-1]}'
+            else:
+                print('else')
+                url = get_thumbnailer(instance)[self.alias].url
+
+        if url == '' or url is None:
             return None
 
         request = self.context.get('request', None)

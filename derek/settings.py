@@ -155,8 +155,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 THUMBNAIL_ALIASES = {
     '': {
         'product_img': {'size': (400, 400), 'crop': False},
-        'ten': {'size': (120, 120), 'crop': False},
-        'cart': {'size': (200, 200), 'crop': False},
+        'ten': {'size': (200, 200), 'crop': False},
         'prod_photo': {'size': (900, 900), 'crop': False},
         'btn_img': {'size': (50, 50), 'crop': False},
         'avatar': {'size': (90, 90), 'crop': False},

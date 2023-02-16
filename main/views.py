@@ -117,7 +117,7 @@ class ProductsList(generics.ListAPIView):
 
 # product variant detail view
 class ProductVariantDetail(generics.RetrieveAPIView):
-    queryset = ProductVariants.objects.filter(product__active=True)
+    queryset = ProductVariants.objects.select_related('product').filter(product__active=True)
     serializer_class = ProductVariantDetailSerializer
     lookup_field = 'slug'
 
@@ -125,7 +125,7 @@ class ProductVariantDetail(generics.RetrieveAPIView):
 # top products view
 class TopProductsView(generics.ListAPIView):
     serializer_class = ProductVariantSimpleSerializer
-    queryset = ProductVariants.objects.filter(product__active=True).filter(top=True)
+    queryset = ProductVariants.objects.select_related('product').filter(product__active=True).filter(top=True)
     pagination_class = BasePagination
 
 
@@ -136,7 +136,7 @@ class ProductsSearch(generics.ListAPIView):
     
 
     def get_queryset(self): 
-        queryset = ProductVariants.objects.filter(product__active=True).filter(default=True)
+        queryset = ProductVariants.objects.select_related('product').filter(product__active=True).filter(default=True)
         q = self.request.GET.get('q')
 
         lang = self.request.headers.get("Languages", '')
@@ -167,12 +167,12 @@ class Search(views.APIView):
         if q == '':
             return Response({'error': 'q param is required'})
         
-        products = ProductVariants.objects.filter(product__active=True).filter(default=True)
+        products = ProductVariants.objects.select_related('product').filter(product__active=True).filter(default=True)
         categories = Category.objects.all()
         articles = Articles.objects.filter(active=True)
 
-        articles_results = search_func(q, 'title', queryset=articles, fields=['title', 'subtitle', 'slug', 'created_date'], image_fields=['image'], request=request)
-        product_results = search_func(q, 'name', queryset=products, fields=['name', 'slug'], image_fields=['image'], request=request, product=True)
+        articles_results = search_func(q, 'title', queryset=articles, fields=['subtitle', 'title', 'description', 'slug', 'created_date'], image_fields=['image'], request=request)
+        product_results = search_func(q, 'name', queryset=products, fields=['slug', 'title', 'image', 'description'], image_fields=['image'], request=request, product=True)
         cotalog_results = search_func(q, 'name', queryset=categories, fields=['name', 'id'], image_fields=['image'], request=request)
 
         res_data = {}

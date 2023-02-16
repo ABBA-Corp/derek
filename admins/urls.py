@@ -93,7 +93,8 @@ urlpatterns = [
     path("colors/create", views.ColorsCreate.as_view(), name='color_create'),
     path("colors/<int:pk>/edit", views.ColorEdit.as_view(), name='colors_edit'),
     path("products", views.ProductsList.as_view(), name='products_list'),
-    path('products/create', views.ProductsCreate.as_view(), name='products_create')
+    path('products/create', views.ProductsCreate.as_view(), name='products_create'),
+    path("get_ctg_atributs", views.get_ctg_atributs, name='get_ctg_atributs')
 
     #path("fill_db_qwertyuiop", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.fill_db_view))
 ]

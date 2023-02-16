@@ -1,16 +1,29 @@
 from django.db import models
 from easy_thumbnails.fields import ThumbnailerImageField
+from easy_thumbnails.templatetags.thumbnail import get_thumbnailer
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, FileExtensionValidator
 import re
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.text import slugify
 import random
 import string
 import cyrtranslit
 # telephone nbm validator
+
+
+# sace image function
+def save_image(image):
+    aliases = ['product_img', 'original', 'avatar', 'btn_img', 'prod_photo', 'ten']
+    thumbs = []
+
+    for alias in aliases:
+        thumb = get_thumbnailer(image)[alias]
+        thumbs.append(thumb)
+
+    return thumbs
 
 
 def random_string_generator(size=10, chars=string.ascii_lowercase + string.digits):
@@ -75,6 +88,11 @@ class StaticInformation(models.Model):
 
     def __str__(self):
         return 'Static information'
+
+    
+    def save(self, *args, **kwargs):
+        return super().save(*args, **kwargs)
+
 
 
 
@@ -157,7 +175,8 @@ class Articles(models.Model):
     def save(self, *args, **kwargs):  # new
         if not self.slug:
             lng = Languages.objects.filter(active=True).filter(default=True).first()
-            str = cyrtranslit.to_latin(self.title.get(lng.code))
+            str = cyrtranslit.to_latin(self.title.get(lng.code, '')[:50])
+            print(str)
             slug = slugify(str)
             self.slug = unique_slug_generator(self, slug)
 

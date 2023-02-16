@@ -141,7 +141,7 @@
                     </label>
                     <br>
                     <!-- Input -->
-                    <select class="form-control" data-choices name="category">
+                    <select class="form-control" id="product_ctg_select" data-choices name="category">
                         {% for ctg in relateds %}
                         {% if object and ctg == object.category %}
                         <option value="{{ ctg.id }}" selected>{{ ctg.name|get_item:lang.code }}</option>
@@ -184,6 +184,7 @@
     <div class="col-12 col-xl-12">
         <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
             <div class="blog_container">
+                <span class="delete_variant_btn with-ajax" data-id="1">&#215;</span>
                 <div class="blog_control">
                     <div class="blog_header">
                         <h2>Вариация 1</h2>
@@ -193,21 +194,21 @@
                         <div class="form_control">
                             <div class="input_box">
                                 <label for="color">Цвета</label>
-                                <select name="color" id="price">
+                                <select name="color[1]" id="color">
                                     {% for color in colors %}
                                     <option value="{{ color.id }}">{{ color.name|get_item:lang.code }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="input_box">
-                                <label for="color">Цена</label>
-                                <input type="number" name="price">
+                                <label for="price">Цена</label>
+                                <input type="number" name="price[1]">
                             </div>
                             <div class="input_box">
                                 <label for="color">Артикул</label>
-                                <input type="text" name="code">
+                                <input type="text" name="code[1]">
                             </div>
-                            <span id="atributs_wrap"></span>
+                            <span class="atributs_wrap"></span>
                         </div>
                         <div class="blog_images">
                             <div class="images_title">
@@ -216,7 +217,7 @@
                             <div class="image_file_control">
                                 <div class="image_file">
                                     <span class="delete_img no-ajax">x</span>
-                                    <input type="file" class="image_input" id="input" name="file" />
+                                    <input type="image[1]" class="image_input" id="input" name="file" />
                                     <img class="image_files" src="./images/media-content-image.png" alt="" />
                                     <span class="img_text">Добавить изображение</span>
                                     <div class="display-image"></div>
@@ -239,6 +240,7 @@
         CKEDITOR.replace(txt)
     }
 </script>
+<script src="{% static 'assets/js/add_product.js' %}"></script>
 
 <!-- Map JS -->
 

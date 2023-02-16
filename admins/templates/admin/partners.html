@@ -92,7 +92,7 @@
                             <img class="avatar-img rounded-circle" src="{% static 'src/img/default.png' %}" alt="...">
                             {% endif %}
                         </div>
-                        {{ obj.name|get_item:lang.code }}
+                        {{ obj.name|get_item:lang.code|cut_text }}
                         </p>
                     </td>
                     <td>

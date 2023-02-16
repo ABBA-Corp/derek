@@ -24,7 +24,7 @@ class Colors(models.Model):
     def save(self, *args, **kwargs):  # new
         if not self.slug:
             lng = Languages.objects.filter(active=True).filter(default=True).first()
-            str = cyrtranslit.to_latin(self.name.get(lng.code))
+            str = cyrtranslit.to_latin(self.name.get(lng.code, '')[:50])
             slug = slugify(str)
             self.slug = unique_slug_generator(self, slug)
             print(self.slug)
@@ -69,7 +69,7 @@ class Products(models.Model):
     def save(self, *args, **kwargs):  # new
         if not self.slug:
             lng = Languages.objects.filter(active=True).filter(default=True).first()
-            str = cyrtranslit.to_latin(self.name.get(lng.code))
+            str = cyrtranslit.to_latin(self.name.get(lng.code, '')[:50])
             slug = slugify(str)
             self.slug = unique_slug_generator(self, slug)
 
@@ -93,7 +93,7 @@ class ProductVariants(models.Model):
         if not self.slug:
             lng = Languages.objects.filter(active=True).filter(default=True).first()
             str = cyrtranslit.to_latin(self.product.name.get(lng.code, 'prod') + self.color.name.get(lng.code, 'color'))
-            slug = slugify(str)
+            slug = slugify(str[:50])
             self.slug = unique_slug_generator(self, slug, Products)
 
         return super().save(*args, **kwargs)
