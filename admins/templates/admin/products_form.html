@@ -1,6 +1,7 @@
 {% extends 'admin/base_template.html' %}
 {% load static %}
 {% load get_item %}
+{% load range %}
 
 {% block css %} 
 <link rel="stylesheet" href="{% static 'assets/css/variants.css' %}">
@@ -30,6 +31,7 @@
 {% block content %}
 <form class="row" action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <input type="hidden" name="variant_count" value="1">
     <input type="hidden" name="dropzone-key" value="{{ dropzone_key }}">
     <input type="hidden" name="id" value="{{ object.id }}">
     <input type="hidden" name="url" value="{{ request.get_full_path }}">
@@ -143,13 +145,13 @@
                     <!-- Input -->
                     <select class="form-control" id="product_ctg_select" data-choices name="category">
                         {% for ctg in relateds %}
-                        {% if object and ctg == object.category %}
-                        <option value="{{ ctg.id }}" selected>{{ ctg.name|get_item:lang.code }}</option>
-                        {% elif request_post and ctg.id == request_post|get_item:'category' %}
-                        <option value="{{ ctg.id }}" selected>{{ ctg.name|get_item:lang.code }}</option>
-                        {% else %}
-                        <option value="{{ ctg.id }}">{{ ctg.name|get_item:lang.code }}</option>
-                        {% endif %}
+                            {% if object and ctg == object.category %}
+                                <option value="{{ ctg.id }}" selected>{{ ctg.name|get_item:lang.code }}</option>
+                            {% elif request_post and ctg.id == request_post|get_item:'category' %}
+                                <option value="{{ ctg.id }}" selected>{{ ctg.name|get_item:lang.code }}</option>
+                            {% else %}
+                                <option value="{{ ctg.id }}">{{ ctg.name|get_item:lang.code }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
 
@@ -181,53 +183,198 @@
         </div>
     </div>
 
-    <div class="col-12 col-xl-12">
-        <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
-            <div class="blog_container">
-                <span class="delete_variant_btn with-ajax" data-id="1">&#215;</span>
-                <div class="blog_control">
-                    <div class="blog_header">
-                        <h2>Вариация 1</h2>
-                        <p>Главный товар {{ variant_form.default }}</p>
-                    </div>
-                    <div class="blog_body">
-                        <div class="form_control">
-                            <div class="input_box">
-                                <label for="color">Цвета</label>
-                                <select name="color[1]" id="color">
-                                    {% for color in colors %}
-                                    <option value="{{ color.id }}">{{ color.name|get_item:lang.code }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="input_box">
-                                <label for="price">Цена</label>
-                                <input type="number" name="price[1]">
-                            </div>
-                            <div class="input_box">
-                                <label for="color">Артикул</label>
-                                <input type="text" name="code[1]">
-                            </div>
-                            <span class="atributs_wrap"></span>
+    <div class="col-12 col-xl-12" style="padding-bottom: 30px;">
+        <span id="products_variant_container">
+        {% if not object and not request_post %}
+            <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5">
+                <div class="blog_container">
+                    <div class="blog_control">
+                        <div class="blog_header">
+                            <h2>Вариация 1</h2>
+                            <p>Главный товар {{ variant_form.default }}</p>
                         </div>
-                        <div class="blog_images">
-                            <div class="images_title">
-                                <h5>Изображение товара</h5>
+                        <div class="blog_body">
+                            <div class="form_control">
+                                <div class="input_box">
+                                    <label for="color">Цвета</label>
+                                    <select name="color[1]" id="color">
+                                        {% for color in colors %}
+                                        <option value="{{ color.id }}">{{ color.name|get_item:lang.code }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="input_box">
+                                    <label for="price">Цена</label>
+                                    <input type="number" name="price[1]">
+                                </div>
+                                <div class="input_box">
+                                    <label for="color">Артикул</label>
+                                    <input type="text" name="code[1]">
+                                </div>
+                                <span class="atributs_wrap" data-item="1"></span>
                             </div>
-                            <div class="image_file_control">
-                                <div class="image_file">
-                                    <span class="delete_img no-ajax">x</span>
-                                    <input type="image[1]" class="image_input" id="input" name="file" />
-                                    <img class="image_files" src="./images/media-content-image.png" alt="" />
-                                    <span class="img_text">Добавить изображение</span>
-                                    <div class="display-image"></div>
+                            <div class="blog_images">
+                                <div class="images_title">
+                                    <h5>Изображение товара</h5>
+                                </div>
+                                <div class="image_file_control">
+                                    <div class="image_file">
+                                        <span class="delete_img no-ajax">x</span>
+                                        <input type="file" class="image_input" id="input" name="image[1]" />
+                                        <img class="image_files" src="" alt="" />
+                                        <span class="img_text">Добавить изображение</span>
+                                        <div class="display-image"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% elif variants %}
+            {% for variant, i in variants.pairs %}
+                <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5">
+                    <div class="blog_container">
+                        <div class="blog_control">
+                            <div class="blog_header">
+                                <h2>Вариация {{ i }}</h2>
+                                <p>Главный товар {{ variant_form.default }}</p>
+                            </div>
+                            <div class="blog_body">
+                                <div class="form_control">
+                                    <div class="input_box">
+                                        <label for="color">Цвета</label>
+                                        <input type="text" class="form-control" value="{{ variant.color.name|get_item:lang.code }}"
+                                            disabled>
+                                    </div>
+                                    <div class="input_box">
+                                        <label for="price">Цена</label>
+                                        <input type="number" class="form-control" value="{{ variant.price }}" disabled>
+                                    </div>
+                                    <div class="input_box">
+                                        <label for="color">Артикул</label>
+                                        <input type="text" value="{{ variant.code }}" disabled>
+                                    </div>
+                                    <span class="atributs_wrap" data-item="{{ i }}">
+                                        {% for atribut in object.category.atributs.all %}
+                                        <div class="input_box">
+                                            <label for="color">{{ atribut.name|get_item:lang.code }}</label>
+                                            {% for opt in atribut.options.all %}
+                                                {% if opt in variant.options.all %}
+                                                    <option value="{{ opt.name|get_item:lang.code }}" selected>{{ opt.name|get_item:lang.code }}</option>
+                                                {% else %}
+                                                    <option value="{{ opt.name|get_item:lang.code }}">{{ opt.name|get_item:lang.code }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        {% endfor %}
+                                    </span>
+                                </div>
+                                <div class="blog_images">
+                                    <div class="images_title">
+                                        <h5>Изображение товара</h5>
+                                    </div>
+                                    <div class="image_file_control">
+                                        <div class="image_file">
+                                            <span class="img_text">Добавить изображение</span>
+                                            {% if variant.image %}
+                                            <div class="display-image"
+                                                style="background-image: url('{{ variant.image.url }}'); display:block;"></div>
+                                            {% else %}
+                                            <div class="display-image"></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% elif variants_request %}
+            {% for variant, i in variants_request.pairs %}
+                <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5">
+                    <div class="blog_container">
+                        <div class="blog_control">
+                            <div class="blog_header">
+                                <h2>Вариация {{ i }}</h2>
+                                <p>Главный товар {{ variant_form.default }}</p>
+                            </div>
+                            <div class="blog_body">
+                                <div class="form_control">
+                                    <div class="input_box">
+                                        <label for="color">Цвета</label>
+                                        <select name="color[1]" id="color">
+                                            {% for color in colors %}
+                                            {% if color.id == variant.color %}
+                                                <option value="{{ color.id }}" selected>{{ color.name|get_item:lang.code }}</option>
+                                            {% else %}
+                                                <option value="{{ color.id }}">{{ color.name|get_item:lang.code }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <input type="text" class="form-control" {% if variant.color %} value="{{ variant.color.name|get_item:lang.code }}" {% endif %}>
+                                        <div class="invalid-feedback" style="display: block;">
+                                            {% if color_error and color_error.item == i %}
+                                                {{ color_error.error }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="input_box">
+                                        <label for="price">Цена</label>
+                                        <input type="number" class="form-control" {% if variant.price %} value="{{ variant.price }}" {% endif %}>
+                                        <div class="invalid-feedback" style="display: block;">
+                                            {% if price_error and price_error.item == i %}
+                                            {{ price_error.error }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="input_box">
+                                        <label for="color">Артикул</label>
+                                        <input type="text" value="{{ variant.code }}" disabled>
+                                    </div>
+                                    <span class="atributs_wrap" data-item="{{ i }}">
+                                        {% for atribut in atributs %}
+                                        <div class="input_box">
+                                            <label for="color">{{ atribut.name|get_item:lang.code }}</label>
+                                            {% for opt in atribut.options.all %}
+                                                {% if opt in options %}
+                                                <option value="{{ opt.name|get_item:lang.code }}" selected>
+                                                    {{ color.name|get_item:lang.code }}</option>
+                                                {% else %}
+                                                <option value="{{ opt.name|get_item:lang.code }}">{{ color.name|get_item:lang.code }}
+                                                </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        {% endfor %}
+                                    </span>
+                                </div>
+                                <div class="blog_images">
+                                    <div class="images_title">
+                                        <h5>Изображение товара</h5>
+                                    </div>
+                                    <div class="image_file_control">
+                                        <div class="image_file">
+                                            <span class="img_text">Добавить изображение</span>
+                                            {% if variant.image %}
+                                            <div class="display-image"
+                                                style="background-image: url('{{ variant.image.url }}'); display:block;"></div>
+                                            {% else %}
+                                            <div class="display-image"></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        </span>
+        <button type="button" class="add-variant-button new-variant-btn" id="add_new_atribut">+ Новый вариант</button>
+        
     </div>
 </form>
 <!-- Form -->
@@ -235,12 +382,77 @@
 
 
 <!-- JAVASCRIPT -->
+<script src="{% static 'assets/js/add_product.js' %}"></script>
 <script>
     for (let txt of document.querySelectorAll('.editor')) {
         CKEDITOR.replace(txt)
     }
+
+
+
+    $('#add_new_atribut').on("click", () => {
+        $('input[name="variant_count"]').val(Number($('input[name="variant_count"]').val()) + 1)
+        let curent_nbm = Number($('input[name="variant_count"]').val()) 
+        $('.delete_variant_btn.no-ajax').last().remove()
+
+        let new_html = `
+            <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5">
+                <div class="blog_container">
+                    <div class="blog_control">
+                        <div class="blog_header">
+                            <h2>Вариация ${curent_nbm}</h2>
+                            <p>Главный товар {{ variant_form.default }}</p>
+                        </div>
+                        <div class="blog_body">
+                            <div class="form_control">
+                                <div class="input_box">
+                                    <label for="color">Цвета</label>
+                                    <select name="color[${curent_nbm}]" id="color">
+                                        {% for color in colors %}
+                                        <option value="{{ color.id }}">{{ color.name|get_item:lang.code }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="input_box">
+                                    <label for="price">Цена</label>
+                                    <input type="number" name="price[${curent_nbm}]">
+                                </div>
+                                <div class="input_box">
+                                    <label for="color">Артикул</label>
+                                    <input type="text" name="code[${curent_nbm}]">
+                                </div>
+                                <span class="atributs_wrap" data-item="${curent_nbm}"></span>
+                            </div>
+                            <div class="blog_images">
+                                <div class="images_title">
+                                    <h5>Изображение товара</h5>
+                                </div>
+                                <div class="image_file_control">
+                                    <div class="image_file">
+                                        <span class="delete_img no-ajax">x</span>
+                                        <input type="file" class="image_input" id="input" name="image[${curent_nbm}]" />
+                                        <img class="image_files" src="" alt="" />
+                                        <span class="img_text">Добавить изображение</span>
+                                        <div class="display-image"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `
+
+        document.getElementById('products_variant_container').insertAdjacentHTML('beforeend', new_html);
+
+        if (category_atributs != undefined) {
+            let wrap = document.querySelector(`span[data-item="${curent_nbm}"]`)
+            console.log(wrap)
+            fill_atributs(wrap, category_atributs)
+        }
+
+    })
 </script>
-<script src="{% static 'assets/js/add_product.js' %}"></script>
 
 <!-- Map JS -->
 

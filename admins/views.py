@@ -136,7 +136,6 @@ def delete_alot(request):
 
 # save images
 def save_images(request):
-    print(request.FILES)
     if request.method == 'POST':
         key = request.POST.get("key")
         file = request.FILES.get('file')
@@ -186,7 +185,6 @@ def add_static_image(request):
     key = request.POST.get("key")
     file = request.FILES.get('file')
 
-    print(file)
 
     try:
         model = StaticInformation.objects.get(id=1)
@@ -286,7 +284,6 @@ class ArticleCreateView(BasedCreateView):
 
             meta_dict = serialize_request(MetaTags, request)
             try:
-                print(meta_dict)
                 meta = MetaTags(**meta_dict)
                 meta.full_clean()
                 meta.save()
@@ -696,8 +693,6 @@ class TranslationGroupUdpate(UpdateView):
                     {'key': f'value[{l}][{lng.code}]', 'value': request.POST[f'value[{l}][{lng.code}]'], 'def_lang': lang.code, 'lng': lng.code})
 
             data.append(new_data)
-
-        print(data)
 
         objects = dict(pairs=zip(data, list(range(1, int(items_count) + 1))))
 
@@ -1552,7 +1547,6 @@ class AtributOptionEdit(UpdateView):
     def get_object(self):
         try:
             id = self.request.POST.get("id")
-            print(id)
             return AtributOptions.objects.get(id=int(id))
         except:
             return None
@@ -1665,64 +1659,90 @@ CHECKBOX_MAPPING = {'on': True, 'off': False}
 
 
 # get variants data
-def get_variant_dict(request, i, data, template_name, product):
-    data_dict = {}
-    data_dict['price'] = request.POST.get(f'price[{i}]')
+def get_variants_list(request, range):
+    end_variant_list = []
+    
+    for i in range:
+        data_dict = {}
+        data_dict['price'] = request.POST.get(f'price[{i}]', -1)
+        data_dict['code'] = request.POST.get(f'code[{i}]')
 
-    if data_dict['price'] is None or 0 > float(data_dict['price']):
-        data['request_post'] = data_dict
-        data['price_error'] = {}
-        data['price_error']['error'] = 'This field is required and should be frreater than 0'
-        data['price_error']['item'] = i
-        return render(request, template_name, data)
+        option_ids = request.POST.getlist(f'option[{i}]')
 
-    data_dict['code'] = request.POST.get('code')
-    if data_dict['code'] is None:
-        data['request_post'] = data_dict
-        data['code_error'] = {}
-        data['code_error']['error'] = 'This field is required'
-        data['code_error']['item'] = i
-        return render(request, template_name, data)
+        data_dict['options'] = []
+        for it in option_ids:
+            try:
+                data_dict['options'].append(AtributOptions.objects.get(id=int(it)))
+            except:
+                pass   
+        
+        atrs = set()
+        for opt in data_dict['options']:
+            atrs.add(opt.atribut)
 
-    option_ids = request.POST.getlist(f'options[{i}]')
-    if len(option_ids) != product.category.atributs.count():
-        data['request_post'] = data_dict
-        data['options_error'] = {}
-        data['options_error']['error'] = 'Choosen options count is invalid.'
-        data['options_error']['item'] = i
-        return render(request, template_name, data)
+        data_dict['atributs'] = atrs
 
-    data_dict['options'] = []
-    for it in option_ids:
+        color_id = request.POST.get(f'color[{i}]')
         try:
-            data_dict['options'].append(AtributOptions.objects.get(id=int(it)))
+            data_dict['color'] = Colors.objects.get(id=int(color_id))
         except:
-            pass
+            data_dict['color'] = None
 
-    color_id = request.POST.get(f'variant_color[{i}]')
+        image = request.FILES.get(f'image[{i}]')
+        if image:
+            data_dict['image'] = image
 
-    color = Colors.objects.filter(id=int(color_id))
+        top_val = request.POST.get('top', 'off')
+        data_dict['top'] = CHECKBOX_MAPPING.get(top_val)
 
-    if color.exists() is False:
-        data['request_post'] = data_dict
-        data['color_error'] = {}
-        data['color_error']['error'] = 'Choosen color is invalid.'
-        data['color_error']['item'] = i
-        return render(request, template_name, data)
-    else:
-        data_dict['color'] = color.first()
+        default_val = request.POST.get('default', 'off')
+        data_dict['default'] = CHECKBOX_MAPPING.get(default_val)
 
-    image = request.FILES.get(f'image[{i}]')
-    if image:
-        data_dict['image'] = image
+        end_variant_list.append(data_dict)
 
-    top_val = request.POST.get('top', 'off')
-    data_dict['top'] = CHECKBOX_MAPPING.get(top_val)
+    return end_variant_list
 
-    default_val = request.POST.get('default', 'off')
-    data_dict['default'] = CHECKBOX_MAPPING.get(default_val)
 
-    return data_dict
+def costruct_variant_error(field, data, message, request_d, var_d, i):
+    data['request_post'] = request_d
+    
+    rang = range(1, len(var_d) + 1)
+    data['variants_request'] = dict(pairs=zip(var_d, rang))
+    data[f'{field}_error'] = {}
+    data[f'{field}_error']['error'] = message
+    data[f'{field}_error']['item'] = i
+
+    return data
+
+
+def is_valid_variant(var_dict, i, data, product, data_dict, variant_list):
+    valid = True
+    if var_dict.get('price', '') == '' or 0 > float(var_dict['price']):
+        data = costruct_variant_error(
+            'price', data, 'This fiedl is required and shoulb be grater than 0', data_dict, variant_list, i)
+        valid = False
+
+    if var_dict.get('code') is None:
+        data = costruct_variant_error(
+            'code', data, 'This field is required', data_dict, variant_list, i)
+        valid = False
+
+    if len(var_dict.get('options')) != product.category.atributs.count():
+        data = costruct_variant_error(
+            'options', data, 'This options count is invalid', data_dict, variant_list, i)
+        valid = False
+
+    if var_dict.get('color') is None:
+        data = costruct_variant_error(
+            'color', data, 'Choosen color is invalid.', data_dict, variant_list, i)
+        valid = False
+
+    if valid is False:
+        return {'valid': False, 'data': data}
+
+
+    return {'valid': True}
+
 
 
 # products create
@@ -1745,45 +1765,58 @@ class ProductsCreate(BasedCreateView):
 
         data = self.get_context_data()
         variants_count = request.POST.get('variant_count')
+        variant_list = get_variants_list(request, range(1, int(variants_count)+1))
 
         category = Category.objects.filter(id=int(category_id))
         if category.exists():
             data_dict['category'] = category.first()
         else:
             data['request_post'] = data_dict
+            data['variants'] = variant_list
             data['category_error'] = 'This field is invalid.'
             return render(request, self.template_name, data)
 
         if variants_count is None:
             data['request_post'] = data_dict
+            data['variants'] = variant_list
             return render(request, self.template_name, data)
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
+            data['variants'] = variant_list
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
-        try:
-            product = Products(**data_dict)
-            product.full_clean()
-            product.save()
+        #try:
+        product = Products(**data_dict)
+        product.full_clean()
+        product.save()
 
-            for i in range(1, int(variants_count)+1):
-                variant_dict = get_variant_dict(
-                    request, i, data, self.template_name, product)
-                variant_dict['product'] = product
-                options = variant_dict.pop('options')
+        print(variant_list)
 
-                variant = ProductVariants.objects.create(**variant_dict)
+        for var_dict in variant_list:
+            i = variant_list.index(var_dict) + 1
+            is_valid = is_valid_variant(
+                var_dict=var_dict, i=i, data=data, product=product, data_dict=data_dict, variant_list=variant_list 
+            )
+            if is_valid.get('valid') is False:
+                print(is_valid.get("data"))
+                return render(request, self.template_name, is_valid.get('data'))
+            else:
+                var_dict['product'] = product
+                options = var_dict.pop('options')
+                del var_dict['atributs']
+
+                variant = ProductVariants.objects.create(**var_dict)
                 variant.options.set(options)
                 if variant.full_clean():
                     variant.save()
                 else:
                     print(variant.full_clean())
-        except:
-            pass
+                #except:
+                #    pass
 
-            return redirect('home')
+                #return redirect('home')
 
 
 # products edit
@@ -1797,6 +1830,12 @@ class ProductEdit(UpdateView):
         context['langs'] = Languages.objects.filter(
             active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
+        context['relateds'] = Category.objects.order_by('-id')
+        context['colors'] = Colors.objects.all()
+        variants = self.get_object().variants.all()
+        rang = range(1, variants.count() + 1)
+
+        context['variants'] = dict(pairs=zip(variants, rang))
 
         return context
 
@@ -1826,8 +1865,8 @@ class ProductEdit(UpdateView):
         instance.save()
 
         for i in range(1, old_count+1):
-            variant = instance.variant[i]
-            variant_dict = get_variant_dict(
+            variant = instance.variants.all()[i]
+            variant_dict = get_variants_list(
                 request, i, data, self.template_name, instance)
             options = variant_dict.pop('options')
 
@@ -1840,8 +1879,8 @@ class ProductEdit(UpdateView):
                 print(variant.full_clean())
 
         for l in range(old_count+1, new_items_count + 1):
-            variant_dict = get_variant_dict(
-                request, l, data, self.template_name, instance)
+            variant_dict = get_variants_list(
+                request, range(range(old_count+1, new_items_count + 1)))
             variant_dict['product'] = instance
             options = variant_dict.pop('options')
 
@@ -1851,6 +1890,26 @@ class ProductEdit(UpdateView):
                 variant.save()
             else:
                 print(variant.full_clean())
+
+
+# class products detail view
+class ProductsDetailView(DetailView):
+    model = Products
+    template_name = 'admin/product_view.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductsDetailView, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(
+            active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+        
+        variants = self.get_object().variants.all()
+        rang = range(1, variants.count() + 1)
+
+        context['variants'] = dict(pairs=zip(variants, rang))
+
+        return context
+
 
 
 # get category atributs
@@ -1864,4 +1923,4 @@ def get_ctg_atributs(request):
     atributs = category.atributs.all()
     serializer = AtributSerializer(atributs, many=True, context={'request': request})
 
-    return JsonResponse(serializer.data)
+    return JsonResponse(serializer.data, safe=False)

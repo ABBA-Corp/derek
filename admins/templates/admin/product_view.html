@@ -1,0 +1,222 @@
+{% extends 'admin/base_template.html' %}
+{% load static %}
+{% load get_item %}
+{% load range %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'assets/css/variants.css' %}">
+{% endblock %}
+
+
+{% block title %} Форма продукта {% endblock %}
+
+
+{% block page_title %} Форма продукта {% endblock %}
+
+{% block nav_ol %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item ">
+        <a href="{% url 'articles_list' %}">Статьи</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
+        Добавление
+    </li>
+</ol>
+{% endblock %}
+
+{% block content_width %} class="col-12" {% endblock %}
+
+
+{% block content %}
+<div class="row">
+    {% csrf_token %}
+    <input type="hidden" name="url" value="{{ request.get_full_path }}">
+    <div class="col-12 col-xl-8">
+        <div class="card mt-3">
+            <div class="crd-header p-4 pb-0">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    {% for lang in langs %}
+                    {% if lang == langs.first %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-3 py-2 active" id="tab_{{ lang.id }}" data-bs-toggle="tab"
+                            data-bs-target="#{{ lang.code }}" type="button" role="tab" aria-controls="{{ lang.code }}"
+                            aria-selected="true">{{ lang.name }}</button>
+                    </li>
+                    {% else %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-3 py-2" id="tab_{{ lang.id }}" data-bs-toggle="tab"
+                            data-bs-target="#{{ lang.code }}" type="button" role="tab" aria-controls="{{ lang.code }}"
+                            aria-selected="false">{{ lang.name }}</button>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="card-body p-5 pt-4">
+                <div class="tab-content" id="myTabContent">
+                    {% for lang in langs %}
+                    <div {% if lang == langs.first %} class="tab-pane fade show active" {% else %} class="tab-pane fade"
+                        {% endif %} id="{{ lang.code }}" role="tabpanel" aria-labelledby="{{ lang.code }}">
+
+                        <!-- Project name -->
+                        <div class="form-group">
+                            <!-- Label  -->
+                            <label {% if lang.default %} class="form-label required" {% else %} class="form-label" 
+                            {% endif %}>
+                                Название
+                            </label>
+                            <br>
+                            <!-- Input -->
+                            <input type="text" name="name#{{ lang.code }}" class="form-control" disabled
+                            {% if object and object.name|get_item:lang.code %} value="{{ object.name|get_item:lang.code }}" {% endif %}>
+                        </div>
+                        <div class="form-group">
+                            <!-- Label  -->
+                            <label class="form-label">
+                                Производитель
+                            </label>
+                            <br>
+                            <!-- Input -->
+                            <input type="text" name="manufacturer#{{ lang.code }}" 
+                            {% if object and object.manufacturer|get_item:lang.code %}
+                                value="{{ object.manufacturer|get_item:lang.code }}" {% endif %}
+                            class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <!-- Label  -->
+                            <label class="form-label">
+                                Тип
+                            </label>
+                            <br>
+                            <!-- Input -->
+                            <input type="text" name="type#{{ lang.code }}" {% if object.type %}
+                                value="{{ object.type|get_item:lang.code }}" {% endif %}
+                                class="form-control" disabled>
+                        </div>
+                        <!-- Project description -->
+                        <div class="form-group">
+                            <!-- Label -->
+                            <label class="form-label mb-1">
+                                Описание
+                            </label>
+                            <br>
+                            <!-- Textarea -->
+                            <textarea disabled class="editor" name="description#{{ lang.code }}" placeholder="Text">
+                                {% if object and object.description|get_item:lang.code %} 
+                                    {{ object.description|get_item:lang.code }} 
+                                {% endif %}</textarea>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-4">
+        <div class="card mt-3">
+            <div class="card-body p-4">
+                <div class="form-group">
+                    <!-- Label  -->
+                    <label class="form-label">
+                        Категории
+                    </label>
+                    <br>
+                    <!-- Input -->
+                    <input type="text" disabled class="form-control" {% if object.category %}  value="{{ object.category.name|get_item:lang.code }}" {% endif %}>
+                </div>
+
+                <div class="col-6">
+                    <a href="{% url 'products_edit' object.id %}" class="d-flex p-1 mt-4"
+                        style="width: max-content;text-decoration: underline;"><i
+                            class="fe fe-edit-2 d-flex align-items-center justify-content-center" style="width: 20px;height:20px"></i>
+                        редактировать</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-12" style="padding-bottom: 30px;">
+        <span id="products_variant_container">
+            {% for variant, i in variants.pairs %}
+            <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5">
+                <div class="blog_container">
+                    <span class="delete_variant_btn no-ajax"onclick="var result = confirm('Want to delete?');if (result){$('#delete-form{{ variant.id }}').submit()}">&#215;</span>
+                    <form action="{% url 'delete' %}" id="delete-form{{ variant.id }}" method="POST" style="display: none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" value="{{ variant.id }}">
+                        <input type="hidden" name="model_name_del" value="ProductVariants">
+                        <input type="hidden" name="app_name_del" value="main">
+                        <input type="hidden" name="url" value="{{ request.get_full_path }}">
+                    </form>
+                    <div class="blog_control">
+                        <div class="blog_header">
+                            <h2>Вариация {{ i }}</h2>
+                            <p>Главный товар {{ variant_form.default }}</p>
+                        </div>
+                        <div class="blog_body">
+                            <div class="form_control">
+                                <div class="input_box">
+                                    <label for="color">Цвета</label>
+                                    <input type="text" class="form-control" value="{{ variant.color.name|get_item:lang.code }}" disabled>
+                                </div>
+                                <div class="input_box">
+                                    <label for="price">Цена</label>
+                                    <input type="number" class="form-control" value="{{ variant.price }}" disabled>
+                                </div>
+                                <div class="input_box">
+                                    <label for="color">Артикул</label>
+                                    <input type="text" value="{{ variant.code }}" disabled>
+                                </div>
+                                {% for atribut in object.category.atributs.all %}
+                                    <div class="input_box">
+                                        <label for="color">{{ atribut.name|get_item:lang.code }}</label>
+                                        {% for opt in atribut.options.all %}
+                                            {% if opt in variant.options.all %}
+                                                <input type="text" value="{{ opt.name|get_item:lang.code }}" disabled>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="blog_images">
+                                <div class="images_title">
+                                    <h5>Изображение товара</h5>
+                                </div>
+                                <div class="image_file_control">
+                                    <div class="image_file">
+                                        <span class="img_text">Добавить изображение</span>
+                                        {% if variant.image %}
+                                        <div class="display-image" style="background-image: url('{{ variant.image.url }}'); display:block;"></div>
+                                        {% else %}
+                                        <div class="display-image"></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </span>
+    </div>
+</div>
+<!-- Form -->
+
+
+
+<!-- JAVASCRIPT -->
+<script src="{% static 'assets/js/add_product.js' %}"></script>
+<script>
+    for (let txt of document.querySelectorAll('.editor')) {
+        CKEDITOR.replace(txt)
+    }
+</script>
+
+<!-- Map JS -->
+
+<!-- Vendor JS -->
+{% endblock %}

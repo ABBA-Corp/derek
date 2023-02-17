@@ -94,7 +94,10 @@ urlpatterns = [
     path("colors/<int:pk>/edit", views.ColorEdit.as_view(), name='colors_edit'),
     path("products", views.ProductsList.as_view(), name='products_list'),
     path('products/create', views.ProductsCreate.as_view(), name='products_create'),
-    path("get_ctg_atributs", views.get_ctg_atributs, name='get_ctg_atributs')
+    path('products/<int:pk>', views.ProductsDetailView.as_view(), name='products_detail'),
+    path('products/<int:pk>/edit', views.ProductEdit.as_view(), name='products_edit'),
+    path("get_ctg_atributs", views.get_ctg_atributs, name='get_ctg_atributs'),
+    
 
     #path("fill_db_qwertyuiop", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.fill_db_view))
 ]

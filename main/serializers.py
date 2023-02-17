@@ -214,6 +214,7 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
         
         atributs = instance.product.category.atributs.all()
         colors = list(set([it.color for it in instance.product.variants.all()]))
+        print(colors)
         data['atributs'] = []
 
         for atr in atributs:
