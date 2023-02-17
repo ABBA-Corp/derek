@@ -100,7 +100,9 @@
                     </td>
                     <td>
                         <p class="item-text text-reset">
+                            {% if obj.description %}
                             {{ obj.description|get_item:lang.code|cut_text }}
+                            {% endif %}
                         </p>
                     </td>
                     <td>
