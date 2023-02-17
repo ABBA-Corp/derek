@@ -1664,10 +1664,12 @@ def get_variants_list(request, range):
     
     for i in range:
         data_dict = {}
-        data_dict['price'] = request.POST.get(f'price[{i}]', -1)
+        data_dict['i'] = i
+        data_dict['price'] = request.POST.get(f'price[{i}]')
         data_dict['code'] = request.POST.get(f'code[{i}]')
 
         option_ids = request.POST.getlist(f'option[{i}]')
+        print(option_ids)
 
         data_dict['options'] = []
         for it in option_ids:
@@ -1675,12 +1677,6 @@ def get_variants_list(request, range):
                 data_dict['options'].append(AtributOptions.objects.get(id=int(it)))
             except:
                 pass   
-        
-        atrs = set()
-        for opt in data_dict['options']:
-            atrs.add(opt.atribut)
-
-        data_dict['atributs'] = atrs
 
         color_id = request.POST.get(f'color[{i}]')
         try:
@@ -1768,24 +1764,25 @@ class ProductsCreate(BasedCreateView):
         variant_list = get_variants_list(request, range(1, int(variants_count)+1))
 
         category = Category.objects.filter(id=int(category_id))
+        
         if category.exists():
             data_dict['category'] = category.first()
-        else:
+        '''else:
             data['request_post'] = data_dict
-            data['variants'] = variant_list
+            data['variants_request'] = variant_list
             data['category_error'] = 'This field is invalid.'
             return render(request, self.template_name, data)
 
         if variants_count is None:
             data['request_post'] = data_dict
-            data['variants'] = variant_list
+            data['variants_request'] = variant_list
             return render(request, self.template_name, data)
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
-            data['variants'] = variant_list
+            data['variants_request'] = variant_list
             data['name_error'] = 'This field is required.'
-            return render(request, self.template_name, data)
+            return render(request, self.template_name, data)'''
 
         #try:
         product = Products(**data_dict)
@@ -1795,28 +1792,20 @@ class ProductsCreate(BasedCreateView):
         print(variant_list)
 
         for var_dict in variant_list:
-            i = variant_list.index(var_dict) + 1
-            is_valid = is_valid_variant(
-                var_dict=var_dict, i=i, data=data, product=product, data_dict=data_dict, variant_list=variant_list 
-            )
-            if is_valid.get('valid') is False:
-                print(is_valid.get("data"))
-                return render(request, self.template_name, is_valid.get('data'))
+            var_dict['product'] = product
+            options = var_dict.pop('options')
+            del var_dict['i']
+
+            variant = ProductVariants.objects.create(**var_dict)
+            variant.options.set(options)
+            if variant.full_clean():
+                variant.save()
             else:
-                var_dict['product'] = product
-                options = var_dict.pop('options')
-                del var_dict['atributs']
+                print(variant.full_clean())
+        #except:
+        #    pass
 
-                variant = ProductVariants.objects.create(**var_dict)
-                variant.options.set(options)
-                if variant.full_clean():
-                    variant.save()
-                else:
-                    print(variant.full_clean())
-                #except:
-                #    pass
-
-                #return redirect('home')
+        return redirect('home')
 
 
 # products edit
@@ -1863,28 +1852,25 @@ class ProductEdit(UpdateView):
         for attr, value in data_dict.items():
             setattr(instance, attr, value)
         instance.save()
+        
+        old_vars = get_variants_list(request, range(1, old_count+1))
+        for vars in old_vars:
+            variant = instance.variants.all()[vars['i']-1]
+            options = vars.pop('options')
+            print(options)
 
-        for i in range(1, old_count+1):
-            variant = instance.variants.all()[i]
-            variant_dict = get_variants_list(
-                request, i, data, self.template_name, instance)
-            options = variant_dict.pop('options')
-
-            for attr, value in variant_dict.items():
+            for attr, value in vars.items():
                 setattr(variant, attr, value)
             variant.options.set(options)
-            if variant.full_clean():
-                variant.save()
-            else:
-                print(variant.full_clean())
+            variant.save()
 
-        for l in range(old_count+1, new_items_count + 1):
-            variant_dict = get_variants_list(
-                request, range(range(old_count+1, new_items_count + 1)))
-            variant_dict['product'] = instance
-            options = variant_dict.pop('options')
+        new_vars = get_variants_list(request, range(old_count+1, new_items_count + 1))
+        for var in new_vars:
+            var['product'] = instance
+            options = var.pop('options')
+            del var['i']
 
-            variant = ProductVariants.objects.create(**variant_dict)
+            variant = ProductVariants.objects.create(**var)
             variant.options.set(options)
             if variant.full_clean():
                 variant.save()
