@@ -8,19 +8,19 @@
 {% endblock %}
 
 
-{% block title %} Форма продукта {% endblock %}
+{% block title %} Страница продукта {% endblock %}
 
 
-{% block page_title %} Форма продукта {% endblock %}
+{% block page_title %} Страница продукта {% endblock %}
 
 {% block nav_ol %}
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
     <li class="breadcrumb-item ">
-        <a href="{% url 'articles_list' %}">Статьи</a>
+        <a href="{% url 'products_list' %}">Продукты</a>
     </li>
     <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
-        Добавление
+        Просмотр
     </li>
 </ol>
 {% endblock %}
@@ -181,6 +181,23 @@
                                     </div>
                                 {% endfor %}
                             </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-12 col-xl-2">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" disabled class="form-check-input is_default" id="id_active" 
+                                        {% if variant.default %} checked {% endif %}>
+                                        <label class="form-check-label" for="flexSwitchCheckDefault">Default</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-2">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" disabled class="form-check-input" id="id_active" {% if variant.top %}
+                                            checked {% endif %}>
+                                        <label class="form-check-label" for="flexSwitchCheckDefault">Top</label>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="blog_images">
                                 <div class="images_title">
                                     <h5>Изображение товара</h5>
@@ -220,3 +237,7 @@
 
 <!-- Vendor JS -->
 {% endblock %}
+
+
+
+

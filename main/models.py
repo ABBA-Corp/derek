@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator, FileExtensionValidator
 from easy_thumbnails.fields import ThumbnailerImageField
 from colorfield.fields import ColorField
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from autoslug import AutoSlugField
 from admins.models import Languages
@@ -76,6 +76,19 @@ class Products(models.Model):
         return super().save(*args, **kwargs)
 
 
+@receiver(pre_save, sender=Products)
+def delete_variants(sender, instance, **kwargs):
+    try:
+        obj = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        # Object is new, so field hasn't technically changed, but you may want to do something else here.
+        pass
+    else:
+        if obj.category != instance.category:  # Field has changed
+            ProductVariants.objects.filter(product=obj).delete()
+    
+
+
 
 # product variant
 class ProductVariants(models.Model):
@@ -95,6 +108,12 @@ class ProductVariants(models.Model):
             str = cyrtranslit.to_latin(self.product.name.get(lng.code, 'prod') + self.color.name.get(lng.code, 'color'))
             slug = slugify(str[:50])
             self.slug = unique_slug_generator(self, slug, Products)
+
+        variants = ProductVariants.objects.filter(product=self.product).exclude(pk=self.pk)
+        if variants.count() > 1 and self.default:
+            for variant in variants:
+                variant.default = False
+                variant.save()
 
         return super().save(*args, **kwargs)
 

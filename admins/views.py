@@ -339,7 +339,7 @@ class ArticleUpdate(UpdateView):
 
         try:
             file = [it for it in request.session.get(
-                key, []) if it['id'] == str(self.get_object().id)][0]
+                key, []) if it['id'] == str(self.get_object().pk)][0]
         except:
             file = None
         categories = request.POST.getlist('categories[]')
@@ -360,7 +360,7 @@ class ArticleUpdate(UpdateView):
             if file:
                 instance.image = file['name']
                 for it in request.session.get(key):
-                    if it['id'] == str(self.get_object().id):
+                    if it['id'] == str(self.get_object().pk):
                         try:
                             request.session.get(key).remove(it)
                             request.session.modified = True
@@ -610,7 +610,7 @@ def translation_update(request):
             if key == '':
                 return JsonResponse({'key_error': 'Key is required'})
 
-            if str(key) in [str(it.key) for it in Translations.objects.exclude(id=translation.id)]:
+            if str(key) in [str(it.key) for it in Translations.objects.exclude(id=translation.pk)]:
                 return JsonResponse({'key_error': 'Key is already in use'})
 
             translation.key = key
@@ -1688,10 +1688,10 @@ def get_variants_list(request, range):
         if image:
             data_dict['image'] = image
 
-        top_val = request.POST.get('top', 'off')
+        top_val = request.POST.get(f'top[{i}]', 'off')
         data_dict['top'] = CHECKBOX_MAPPING.get(top_val)
 
-        default_val = request.POST.get('default', 'off')
+        default_val = request.POST.get(f'default[{i}]', 'off')
         data_dict['default'] = CHECKBOX_MAPPING.get(default_val)
 
         end_variant_list.append(data_dict)
@@ -1784,28 +1784,30 @@ class ProductsCreate(BasedCreateView):
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)'''
 
-        #try:
-        product = Products(**data_dict)
-        product.full_clean()
-        product.save()
+        try:
+            product = Products(**data_dict)
+            product.full_clean()
+            product.save()
 
-        print(variant_list)
+            print(variant_list)
 
-        for var_dict in variant_list:
-            var_dict['product'] = product
-            options = var_dict.pop('options')
-            del var_dict['i']
+            for var_dict in variant_list:
+                var_dict['product'] = product
+                options = var_dict.pop('options')
+                del var_dict['i']
 
-            variant = ProductVariants.objects.create(**var_dict)
-            variant.options.set(options)
-            if variant.full_clean():
-                variant.save()
-            else:
-                print(variant.full_clean())
-        #except:
-        #    pass
+                variant = ProductVariants.objects.create(**var_dict)
+                variant.options.set(options)
+                if variant.full_clean():
+                    variant.save()
+                else:
+                    print(variant.full_clean())
+        except:
+            pass
 
-        return redirect('home')
+        return redirect("products_list")
+
+        
 
 
 # products edit
@@ -1847,7 +1849,7 @@ class ProductEdit(UpdateView):
 
         items_count = int(request.POST.get('variant_count', 0))
         old_count = instance.variants.count()
-        new_items_count = old_count - items_count
+        new_items_count = items_count - old_count
 
         for attr, value in data_dict.items():
             setattr(instance, attr, value)
@@ -1855,16 +1857,20 @@ class ProductEdit(UpdateView):
         
         old_vars = get_variants_list(request, range(1, old_count+1))
         for vars in old_vars:
-            variant = instance.variants.all()[vars['i']-1]
-            options = vars.pop('options')
-            print(options)
+            try:
+                variant = instance.variants.all()[vars['i']-1]
+                options = vars.pop('options')
 
-            for attr, value in vars.items():
-                setattr(variant, attr, value)
-            variant.options.set(options)
-            variant.save()
+                for attr, value in vars.items():
+                    setattr(variant, attr, value)
+                variant.options.set(options)
+                variant.save()
+            except:
+                pass
 
-        new_vars = get_variants_list(request, range(old_count+1, new_items_count + 1))
+        new_vars = get_variants_list(request, range(old_count+1, items_count + 1))
+        print(range(old_count+1, items_count + 1))
+        print('!!!!', new_vars)
         for var in new_vars:
             var['product'] = instance
             options = var.pop('options')
@@ -1876,6 +1882,8 @@ class ProductEdit(UpdateView):
                 variant.save()
             else:
                 print(variant.full_clean())
+
+        return redirect('products_detail', pk=self.get_object().pk)
 
 
 # class products detail view
@@ -1910,3 +1918,8 @@ def get_ctg_atributs(request):
     serializer = AtributSerializer(atributs, many=True, context={'request': request})
 
     return JsonResponse(serializer.data, safe=False)
+
+
+
+
+# FIX: Search, application in frontend

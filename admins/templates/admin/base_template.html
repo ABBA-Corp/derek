@@ -113,6 +113,11 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="{% url 'products_list' %}" class="nav-link" role="button" aria-expanded="false" aria-controls="sidebarPages">
+                                        Продукты
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="{% url 'color_list' %}" class="nav-link" role="button" aria-expanded="false"
                                         aria-controls="sidebarPages">
                                         Цвета
@@ -203,6 +208,7 @@
     <!-- MAIN CONTENT -->
     <div class="main-content">
         <div class="container-fluid">
+            <div class="messages" style="position: fixed; right: 30px; top: 30px; z-index: 999;"></div>
             <div class="row justify-content-center">
                 {% block form_start %} {% endblock %}
                 <div {% block content_width %} {% endblock %}>

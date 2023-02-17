@@ -17,7 +17,7 @@
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
     <li class="breadcrumb-item ">
-        <a href="{% url 'articles_list' %}">Статьи</a>
+        <a href="{% url 'products_list' %}">Продукты</a>
     </li>
     <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
         Добавление
@@ -137,7 +137,8 @@
                     </label>
                     <br>
                     <!-- Input -->
-                    <select class="form-control" id="product_ctg_select" required data-choices name="category">
+                    <select {% if object %} class="form-control ctg_select" {% else %} class="form-control" {% endif %} id="product_ctg_select" required data-choices name="category">
+                        <option value="">-----</option>
                         {% for ctg in relateds %}
                             {% if object and ctg == object.category %}
                                 <option value="{{ ctg.id }}" selected>{{ ctg.name|get_item:lang.code }}</option>
@@ -192,6 +193,7 @@
                                     <div class="input_box">
                                         <label for="color">Цвета</label>
                                         <select name="color[1]" id="color" required>
+                                            <option value="">-----</option>
                                             {% for color in colors %}
                                             <option value="{{ color.id }}">{{ color.name|get_item:lang.code }}</option>
                                             {% endfor %}
@@ -206,11 +208,11 @@
                                         <input type="text" name="code[1]" required>
                                     </div>
                                     <span class="atributs_wrap" data-item="1"></span>
-                                </div>
+                                </div><br>
                                 <div class="row">
                                     <div class="col-12 col-xl-2">
                                         <div class="form-check form-switch">
-                                            <input type="checkbox" name="default[{{ i }}]" class="form-check-input" id="id_active" checked>
+                                            <input type="checkbox" name="default[{{ i }}]" class="form-check-input is_default" id="id_active" checked>
                                             <label class="form-check-label" for="flexSwitchCheckDefault">Default</label>
                                         </div>
                                     </div>
@@ -253,6 +255,7 @@
                                         <div class="input_box">
                                             <label for="color">Цвета</label>
                                             <select name="color[{{ i }}]" required>
+                                                <option value="">-----</option>
                                                 {% for color in colors %}
                                                     {% if variant.color == color %}
                                                         <option value="{{ color.id }}" selected>{{ color.name|get_item:lang.code }}</option>
@@ -271,10 +274,12 @@
                                             <input type="text" value="{{ variant.code }}" name="code[{{ i }}]" required>
                                         </div>
                                         <span class="atributs_wrap" data-item="{{ i }}" required>
+                                            
                                             {% for atribut in object.category.atributs.all %}
                                             <div class="input_box">
                                                 <label for="color">{{ atribut.name|get_item:lang.code }}</label>
                                                 <select name="option[{{ i }}]" id="options_{{i}}_{{atribut.id}}" class='form-select'>
+                                                    <option value="">-----</option>
                                                 {% for opt in atribut.options.all %}
                                                     {% if opt in variant.options.all %}
                                                         <option value="{{ opt.id }}" selected>{{ opt.name|get_item:lang.code }}</option>
@@ -287,16 +292,17 @@
                                             {% endfor %}
                                         </span>
                                     </div>
+                                    <br>
                                     <div class="row">
                                         <div class="col-12 col-xl-2">
                                             <div class="form-check form-switch">
-                                                <input type="checkbox" name="default[{{ i }}]" class="form-check-input" id="id_active" checked>
+                                                <input type="checkbox" name="default[{{ i }}]" class="form-check-input is_default" id="id_active" {% if variant.default %} checked {% endif %}>
                                                 <label class="form-check-label" for="flexSwitchCheckDefault">Default</label>
                                             </div>
                                         </div>
                                         <div class="col-12 col-xl-2">
                                             <div class="form-check form-switch">
-                                                <input type="checkbox" name="top[{{ i }}]" class="form-check-input" id="id_active" checked>
+                                                <input type="checkbox" name="top[{{ i }}]" class="form-check-input" id="id_active" {% if variant.top %} checked {% endif %}>
                                                 <label class="form-check-label" for="flexSwitchCheckDefault">Top</label>
                                             </div>
                                         </div>
@@ -308,6 +314,7 @@
                                         <div class="image_file_control">
                                             <div class="image_file">
                                                 <span class="img_text">Добавить изображение</span>
+                                                <input type="file" class="image_input" id="input" name="image[{{ i }}]" />
                                                 {% if variant.image %}
                                                 <div class="display-image"
                                                     style="background-image: url('{{ variant.image.url }}'); display:block;"></div>
@@ -348,6 +355,9 @@
         let new_html = `
             <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5">
                 <div class="blog_container">
+                    <span class="del_btn_container">
+                        <span class="delete_variant_btn no-ajax" data-id="${curent_nbm}">&#215;</span>
+                    </span>
                     <div class="blog_control">
                         <div class="blog_header">
                             <h2>Вариация ${curent_nbm}</h2>
@@ -371,18 +381,31 @@
                                     <label for="color">Артикул</label>
                                     <input type="text" required name="code[${curent_nbm}]">
                                 </div>
-                                <span class="atributs_wrap" data-item="${curent_nbm}"></span>
+                                <span class="atributs_wrap" data-item="${curent_nbm}">
+                                    {% for atribut in object.category.atributs.all %}
+                                        <div class="input_box">
+                                            <label for="color">{{ atribut.name|get_item:lang.code }}</label>
+                                            <select name="option[${curent_nbm}]" id="options$_curent_nbm_{{atribut.id}}" class='form-select'>
+                                            <option value="">-----</option>
+                                            {% for opt in atribut.options.all %}
+                                                <option value="{{ opt.id }}">{{ opt.name|get_item:lang.code }}</option>
+                                            {% endfor %}
+                                            </select>
+                                        </div>
+                                    {% endfor %}
+                                </span>
                             </div>
+                            <br>
                             <div class="row">
                                     <div class="col-12 col-xl-2">
                                         <div class="form-check form-switch">
-                                            <input type="checkbox" name="default[{{ i }}]" class="form-check-input" id="id_active" checked>
+                                            <input type="checkbox" name="default[${curent_nbm}]" class="form-check-input is_default" id="id_active">
                                             <label class="form-check-label" for="flexSwitchCheckDefault">Default</label>
                                         </div>
                                     </div>
                                     <div class="col-12 col-xl-2">
                                         <div class="form-check form-switch">
-                                            <input type="checkbox" name="top[{{ i }}]" class="form-check-input" id="id_active" checked>
+                                            <input type="checkbox" name="top[${curent_nbm}]" class="form-check-input" id="id_active">
                                             <label class="form-check-label" for="flexSwitchCheckDefault">Top</label>
                                         </div>
                                     </div>

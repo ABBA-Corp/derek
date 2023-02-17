@@ -53,3 +53,47 @@ $(document).on('change', '#product_ctg_select', (e) => {
         }
     })
 })
+
+
+$(document.body).on("change", '.image_input', (e) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+        const uploaded_image = reader.result;
+        const img_box = $(e.target).parent().find('.display-image');
+        img_box.addClass("active");
+        $(e.target).parent().find(".delete_img").addClass("active")
+        img_box[0].style.backgroundImage = `url(${uploaded_image})`;
+    }
+    reader.readAsDataURL(e.target.files[0]);
+})
+
+
+function deleteImage(e) {
+    $(e.target).parent().find('.image_input').val('')
+    $(e.target).parent().find('.display-image').removeClass("active")
+    $(e.target).removeClass('active')
+}
+
+$(document.body).on('click', '.delete_img.no-ajax', (e) => {
+    deleteImage(e)
+})
+
+
+
+$(document).on('change', '.is_default', (e) => {
+    for (let check of $('.is_default')) {
+        check.checked = false
+    }
+    e.target.checked = true
+})
+
+
+$(document).on('change', '.ctg_select', () => {
+    console.log('9')
+    document.querySelector('.messages').insertAdjacentHTML('beforeEnd', '<div class="alert alert-danger message" role="alert"> Внимание! При изменении категории все добавленные вами ранее вариации будут удалены! </div>')
+    
+    setTimeout(() => {
+        console.log($('.message'))
+        $('.message').last().remove()
+    }, 5000)
+})
