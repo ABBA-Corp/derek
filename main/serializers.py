@@ -242,7 +242,7 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
                 color_opt_dict['name'] = JsonFieldSerializer(color.name, context={'request': self.context.get('request')}).data
                 color_opt_dict['curent'] = color == instance.color
 
-            data['colors'].append(color_opt_dict)
+                data['colors'].append(color_opt_dict)
 
 
         return data
