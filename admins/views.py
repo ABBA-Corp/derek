@@ -1436,6 +1436,14 @@ def del_category_file(request):
     return JsonResponse('success', safe=False)
 
 
+
+
+# collect options
+def collect_options(request, nbm):
+    for i in range(1, nbm+1):
+        pass
+
+
 # atributs
 class AtributsList(BasedListView):
     model = Atributs

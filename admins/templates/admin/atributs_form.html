@@ -165,7 +165,11 @@
     for (let txt of document.querySelectorAll('.editor')) {
         CKEDITOR.replace(txt)
     }
-    let curent_id = 1
+
+    $('input[name="options_count"]').val(Number($('input[name="options_count"]').val()) + 1)
+    let curent_id = Number($('input[name="options_count"]').val())
+    $('.delete_variant_btn.no-ajax').last().remove()
+
 
     $('#add_item').on('click', () => {
         document.getElementById('options-tbody').insertAdjacentHTML('beforeend', `

@@ -98,7 +98,7 @@ class JsonFieldSerializer(serializers.BaseSerializer):
         
         data = instance.get(language)
         
-        if data is None:
+        if data is None or data == '':
             data = instance.get(default_lang)
 
         return data
