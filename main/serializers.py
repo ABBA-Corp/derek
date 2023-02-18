@@ -216,18 +216,22 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
         colors = list(set([it.color for it in instance.product.variants.all()]))
         data['atributs'] = []
 
-        variants_for_atrs = instance.product.variants.filter(color=instance.color)
+       
         for atr in atributs:
+            variants_for_atrs = instance.product.variants.filter(color=instance.color)
             data_dict = {}
             data_dict['name'] = JsonFieldSerializer(atr.name, context={'request': self.context.get('request')}).data
             data_dict['options'] = []
 
-            options_list = [it for it in instance.options.all if it.atribut != atr]
+            options_list = [it.id for it in instance.options.all() if it.atribut != atr]
 
             for opt in atr.options.all():
-                options_list.append(opt)
-                
-                if variants_for_atrs.filter(options=options_list).exists():
+                options_list.append(opt.id)
+
+                for op in options_list:
+                    variants_for_atrs = variants_for_atrs.filter(options=op)
+
+                if variants_for_atrs.exists():
                     opt_dict = {}
                     opt_dict['id'] = opt.id
                     opt_dict['name'] = JsonFieldSerializer(opt.name, context={'request': self.context.get('request')}).data
@@ -235,15 +239,19 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
 
                     data_dict['options'].append(opt_dict)
                 
-                options_list.remove(opt)
+                options_list.remove(opt.id)
 
             data['atributs'].append(data_dict)
 
         
         data['colors'] = []
-        variants = instance.product.variants.filter(options=instance.options)
+        variants_for_color = instance.product.variants.all()
+
+        for option in instance.options.all():
+            variants_for_color = variants_for_color.filter(options=option)
+
         for color in colors:
-            if variants.filter(color=color).exists():
+            if variants_for_color.filter(color=color).exists():
                 color_opt_dict = {}
                 color_opt_dict['id'] = color.id
                 color_opt_dict['slug'] = color.slug
