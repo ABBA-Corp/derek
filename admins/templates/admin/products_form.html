@@ -29,7 +29,7 @@
 
 
 {% block content %}
-<form class="row" action="" method="post" enctype="multipart/form-data">
+<form class="row" action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="hidden" name="variant_count" {% if not object %} value="1" {% else %} value="{{ object.variants.count }}" {% endif %}>
     <input type="hidden" name="dropzone-key" value="{{ dropzone_key }}">
@@ -165,12 +165,8 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-
-
-                    <div class="invalid-feedback" style="display: block;">
-                        {% if category_error %}
-                        {{ category_error }}
-                        {% endif %}
+                    <div class="invalid-feedback" id="ctg_error">
+                        This field is required
                     </div>
                 </div>
 

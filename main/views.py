@@ -1,8 +1,8 @@
-from .models import Products, Category, AtributOptions, Atributs, ProductVariants, Colors
+from .models import Products, Category, AtributOptions, Atributs, ProductVariants, Colors, ShortApplication
 from rest_framework import generics, views, pagination, filters
 from .serializers import ProductsSerializer, Categoryserializer, ProductVariantSimpleSerializer, ReviewSerializer, ShortApplicationSerializer, TranslationsSerializerBadVersion
 from .serializers import ArticleSerializer, StaticInformationSerializer, TranslationSerializer, LangsSerializer, PartnersSerializer, ProductVariantDetailSerializer, ArticleDetailSerializer
-from admins.models import Articles, StaticInformation, Partners, Reviews, Translations, Languages, ShortApplication
+from admins.models import Articles, StaticInformation, Partners, Reviews, Translations, Languages
 from rest_framework.response import Response
 from .utils import search_func
 # Create your views here.

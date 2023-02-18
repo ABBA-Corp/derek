@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
 from .models import Articles, Languages, Translations, TranlsationGroups, StaticInformation, AdminInputs, ArticleCategories, FAQ
-from .models import ImageGalery, VideoGalery, AboutUs, MetaTags, telephone_validator, Reviews, ShortApplication, Partners
-from main.models import Products, Category, Atributs, AtributOptions, ProductVariants, Colors
+from .models import ImageGalery, VideoGalery, AboutUs, MetaTags, telephone_validator, Reviews, Partners
+from main.models import Products, Category, Atributs, AtributOptions, ProductVariants, Colors, ShortApplication
 from .forms import LngForm, UserForm  # , ApplicationForm
 from django.core.exceptions import ValidationError
 import datetime

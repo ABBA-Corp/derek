@@ -1,11 +1,11 @@
-from .models import Products, Atributs, AtributOptions, Category, Colors, ProductVariants
+from .models import Products, Atributs, AtributOptions, Category, Colors, ProductVariants, ShortApplication
 from admins.models import Languages
 from rest_framework import serializers
 from django.conf import settings
 from django.core.files.storage import default_storage
 import os
 from easy_thumbnails.templatetags.thumbnail import thumbnail_url, get_thumbnailer
-from admins.models import Articles, StaticInformation, AboutUs, Languages, Translations, MetaTags, Reviews, Partners, ShortApplication
+from admins.models import Articles, StaticInformation, AboutUs, Languages, Translations, MetaTags, Reviews, Partners
 
 
 class ThumbnailSerializer(serializers.BaseSerializer):

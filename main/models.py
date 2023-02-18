@@ -120,8 +120,23 @@ class ProductVariants(models.Model):
         return super().save(*args, **kwargs)
 
 
+# short applications
+class ShortApplication(models.Model):
+    STATUS = [('На рассмотрении', "На рассмотрении"),
+              ("Рассмотрено", "Рассмотрено"), ("Отклонено", "Отклонено")]
 
+    first_name = models.CharField('First name', max_length=255)
+    last_name = models.CharField('Last name', max_length=255, blank=True, null=True)
+    nbm = models.CharField('Nbm', max_length=255)
+    product = models.ForeignKey(ProductVariants, on_delete=models.SET_NULL, blank=True, null=True)
+    status = models.CharField(
+        'Status', default='На рассмотрении', max_length=255, choices=STATUS)
 
+    def get_full_name(self):
+        try:
+            return self.first_name + ' ' + self.last_name
+        except:
+            return self.first_name
 
 
 

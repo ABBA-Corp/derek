@@ -37,6 +37,10 @@ function fill_atributs(wrap, data) {
 $(document).on('change', '#product_ctg_select', (e) => {
     let id = $(e.target).val()
     let url = '/admin/get_ctg_atributs'
+    
+    if(id == '') {
+        return;
+    }
 
     $.ajax({
         url: url,
@@ -96,4 +100,13 @@ $(document).on('change', '.ctg_select', () => {
         console.log($('.message'))
         $('.message').last().remove()
     }, 5000)
+})
+
+
+
+$(document).on('submit', 'form', (e) => {
+    if ($('#product_ctg_select').val() == '') {
+        e.preventDefault()
+        $('#ctg_error').css('display', 'block')
+    }
 })
