@@ -910,7 +910,16 @@ def set_about_video(request):
 class AdminsList(BasedListView):
     model = User
     template_name = 'admin/moterators_list.html'
-    search_fields = ['username', 'first_name', 'last_name']
+
+    def get_queryset(self):
+        queryset = User.objects.filter(is_superuser=True)
+        query = self.request.GET.get("q", '')
+
+        if query != '':
+            queryset = queryset.filter(Q(username__iregex=query) | Q(
+                first_name__iregex=query) | Q(last_name__iregex=query))
+
+        return queryset
 
 
 # super user create
@@ -1438,12 +1447,6 @@ def del_category_file(request):
 
 
 
-# collect options
-def collect_options(request, nbm):
-    for i in range(1, nbm+1):
-        pass
-
-
 # atributs
 class AtributsList(BasedListView):
     model = Atributs
@@ -1512,7 +1515,6 @@ class AtributEdit(UpdateView):
         lst_one = self.get_object().options.all()
         lst_two = range(1, lst_one.count() + 1)
         context['options'] = dict(pairs=zip(lst_one, lst_two))
-    
 
         return context
 
@@ -1523,10 +1525,19 @@ class AtributEdit(UpdateView):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
-        #options = json.loads(request.POST.get('options', "[]"))
+        options_count = request.POST.get("options_count", 0)
+        old_count = self.get_object().options.count()
+
+        try:
+            options = collect_options(int(options_count), request)
+        except:
+            options = collect_options(0, request)
+
+        print(options)
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
+            data['options'] = options
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
@@ -1536,6 +1547,30 @@ class AtributEdit(UpdateView):
             setattr(instance, attr, value)
 
         instance.save()
+
+
+        for i in range(1, old_count + 1):
+            data_dict = get_option_from_post(i, request)
+
+            try:
+                option = instance.options.all()[i-1]
+
+                for attr, value in data_dict.items():
+                    setattr(option, attr, value)
+                option.save()
+            except:
+                pass
+
+
+        for l in range(old_count + 1, int(options_count) + 1):
+            data_dict = get_option_from_post(l, request)
+            data_dict['atribut'] = instance
+
+            try:
+                option = AtributOptions.objects.create(**data_dict)
+                option.save()
+            except:
+                pass
 
         return redirect("atr_list")
 

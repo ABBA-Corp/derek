@@ -2,17 +2,17 @@
 {% load static %}
 {% load get_item %}
 
-{% block title %} Категории {% endblock %}
+{% block title %} Атрибуты {% endblock %}
 
 
-{% block page_title %} Категории {% endblock %}
+{% block page_title %} Атрибуты {% endblock %}
 
 
 {% block nav_ol %}
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
     <li class="breadcrumb-item ">
-        <a href="{% url 'category_list' %}">Категории</a>
+        <a href="{% url 'atr_list' %}">Атрибуты</a>
     </li>
     <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
         Создать
@@ -140,9 +140,6 @@
                 <!-- Buttons -->
                 {% endif %}
             </div>
-
-
-
                 <div class="btn-box text-end">
                     <a href="#" class="btn w-30 btn-secondary">
                         Отменить
@@ -159,7 +156,7 @@
         new Tagify(inp)
     }
 
-        // initialize Tagify on the above input node reference
+    // initialize Tagify on the above input node reference
         
 
     for (let txt of document.querySelectorAll('.editor')) {
@@ -181,7 +178,7 @@
                 {% endfor %}
                 <td>
                     <div class="d-flex justify-content-end">
-                        <a class="btn btn-sm btn-danger ms-3 new_options_delete"><i class="fe fe-trash"></i></a>
+                        <a class="btn btn-sm btn-danger ms-3 new_options_delete"><i class="fe fe-trash" style="pointer-events: none;"></i></a>
                     </div>
                 </td>
             </tr>

@@ -79,12 +79,8 @@ class BasedModelSerializer(serializers.BaseSerializer):
         for image in image_fields:
             data_dict[image] = ThumbnailSerializer(instance=instance.get(image), alias='prod_photo', context={'request': self.context.get("request")}).data
 
-        
-        
 
         return data_dict
-
-
 
 
 # field lang serializer
@@ -218,28 +214,36 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
         
         atributs = instance.product.category.atributs.all()
         colors = list(set([it.color for it in instance.product.variants.all()]))
-        print(colors)
         data['atributs'] = []
 
+        variants_for_atrs = instance.product.variants.filter(color=instance.color)
         for atr in atributs:
             data_dict = {}
             data_dict['name'] = JsonFieldSerializer(atr.name, context={'request': self.context.get('request')}).data
             data_dict['options'] = []
 
-            for opt in atr.options.all():
-                opt_dict = {}
-                opt_dict['id'] = opt.id
-                opt_dict['name'] = JsonFieldSerializer(opt.name, context={'request': self.context.get('request')}).data
-                opt_dict['curent'] = opt in instance.options.all()
+            options_list = [it for it in instance.options.all if it.atribut != atr]
 
-                data_dict['options'].append(opt_dict)
+            for opt in atr.options.all():
+                options_list.append(opt)
+                
+                if variants_for_atrs.filter(options=options_list).exists():
+                    opt_dict = {}
+                    opt_dict['id'] = opt.id
+                    opt_dict['name'] = JsonFieldSerializer(opt.name, context={'request': self.context.get('request')}).data
+                    opt_dict['curent'] = opt in instance.options.all()
+
+                    data_dict['options'].append(opt_dict)
+                
+                options_list.remove(opt)
 
             data['atributs'].append(data_dict)
 
         
         data['colors'] = []
-        if instance.color:
-            for color in colors:
+        variants = instance.product.variants.filter(options=instance.options)
+        for color in colors:
+            if variants.filter(color=color).exists():
                 color_opt_dict = {}
                 color_opt_dict['id'] = color.id
                 color_opt_dict['slug'] = color.slug

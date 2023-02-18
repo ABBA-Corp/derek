@@ -195,3 +195,25 @@ def required_field_validate(fields: list, data):
             error[field] = 'This field is reuqired'
 
     return error
+
+
+# get option from request
+def get_option_from_post(i, req):
+    print(req)
+    langs = Languages.objects.filter(active=True)
+    data_dict = {}
+    for lang in langs:
+        option = req.POST.get(f'option[{lang.code}][{i}]')
+        data_dict[lang.code] = option
+
+    return {'name': data_dict}
+
+
+# collect options
+def collect_options(nbm, req):
+    end_data = []
+    for i in range(1, nbm+1):
+        data_dict = get_option_from_post(req, i)
+        end_data.append(data_dict)
+
+    return end_data
