@@ -87,6 +87,7 @@ urlpatterns = [
     path('del_ctg_files', views.del_category_file, name='del_ctg_file'),
     path('atributs', views.AtributsList.as_view(), name='atr_list'),
     path("atributs/create", views.AtributsCreate.as_view(), name='atr_create'),
+    path("atributs/<int:pk>/edit", views.AtributEdit.as_view(), name='atribut_edit'),
     path("atribut_options/edit", views.AtributOptionEdit.as_view(), name='atr_options_edit'),
     path("atribut_options/get", views.get_option, name='get_atr_option'),
     path('colors', views.ColorsList.as_view(), name='color_list'),

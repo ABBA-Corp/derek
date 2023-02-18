@@ -91,11 +91,15 @@ class BasedModelSerializer(serializers.BaseSerializer):
 class JsonFieldSerializer(serializers.BaseSerializer):
     def to_representation(self, instance):
         language = self.context['request'].headers.get('Language')
+        default_lang = Languages.objects.filter(default=True).first().code
 
         if not language:
-            language = Languages.objects.filter(default=True).first().code
+            language = default_lang
         
         data = instance.get(language)
+        
+        if data is None:
+            data = instance.get(default_lang)
 
         return data
 
@@ -145,8 +149,8 @@ class ColorSerializer(serializers.ModelSerializer):
 class Categoryserializer(serializers.ModelSerializer):
     name = JsonFieldSerializer()
     deckription = JsonFieldSerializer()
-    icon = ThumbnailSerializer(alias='cart')
-    image = ThumbnailSerializer(alias='cart')
+    icon = ThumbnailSerializer(alias='ten')
+    image = ThumbnailSerializer(alias='ten')
 
     class Meta:
         model = Category

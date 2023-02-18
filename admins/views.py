@@ -374,7 +374,7 @@ class ArticleUpdate(UpdateView):
                 meta = MetaTags.objects.create()
                 instance.meta = meta
                 instance.save()
-                
+
             try:
                 for attr, value in meta_dict.items():
                     if str(attr) != 'id':
@@ -1401,7 +1401,7 @@ class CategoryEdit(UpdateView):
                         pass
 
         if icons:
-            instance.icon = images['name']
+            instance.icon = icons['name']
             for it in request.session.get(f'{key}_icon'):
                 if it['id'] == str(self.get_object().id):
                     try:
@@ -1500,6 +1500,11 @@ class AtributEdit(UpdateView):
         context['langs'] = Languages.objects.filter(
             active=True).order_by('-default')
         context['lang'] = Languages.objects.filter(default=True).first()
+
+        lst_one = self.get_object().options.all()
+        lst_two = range(1, lst_one.count() + 1)
+        context['options'] = dict(pairs=zip(lst_one, lst_two))
+    
 
         return context
 
