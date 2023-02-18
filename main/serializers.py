@@ -222,45 +222,28 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
             data_dict['name'] = JsonFieldSerializer(atr.name, context={'request': self.context.get('request')}).data
             data_dict['options'] = []
 
-            options_list = [it.id for it in instance.options.all() if it.atribut != atr]
-            print(options_list)
 
             for opt in atr.options.all():
-                variants_for_atrs = instance.product.variants.filter(
-                    color=instance.color)
-                options_list.append(opt.id)
+                opt_dict = {}
+                opt_dict['id'] = opt.id
+                opt_dict['name'] = JsonFieldSerializer(opt.name, context={'request': self.context.get('request')}).data
+                opt_dict['curent'] = opt in instance.options.all()
 
-                for op in options_list:
-                    variants_for_atrs = variants_for_atrs.filter(options=op)
-
-                if variants_for_atrs.exists():
-                    opt_dict = {}
-                    opt_dict['id'] = opt.id
-                    opt_dict['name'] = JsonFieldSerializer(opt.name, context={'request': self.context.get('request')}).data
-                    opt_dict['curent'] = opt in instance.options.all()
-
-                    data_dict['options'].append(opt_dict)
-                
-                options_list.remove(opt.id)
+                data_dict['options'].append(opt_dict)
         
             data['atributs'].append(data_dict)
 
         
         data['colors'] = []
-        variants_for_color = instance.product.variants.all()
-
-        for option in instance.options.all():
-            variants_for_color = variants_for_color.filter(options=option)
 
         for color in colors:
-            if variants_for_color.filter(color=color).exists():
-                color_opt_dict = {}
-                color_opt_dict['id'] = color.id
-                color_opt_dict['slug'] = color.slug
-                color_opt_dict['name'] = JsonFieldSerializer(color.name, context={'request': self.context.get('request')}).data
-                color_opt_dict['curent'] = color == instance.color
+            color_opt_dict = {}
+            color_opt_dict['id'] = color.id
+            color_opt_dict['slug'] = color.slug
+            color_opt_dict['name'] = JsonFieldSerializer(color.name, context={'request': self.context.get('request')}).data
+            color_opt_dict['curent'] = color == instance.color
 
-                data['colors'].append(color_opt_dict)
+            data['colors'].append(color_opt_dict)
 
 
         return data
