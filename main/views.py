@@ -172,7 +172,7 @@ class Search(views.APIView):
         articles = Articles.objects.filter(active=True)
 
         articles_results = search_func(q, 'title', queryset=articles, fields=['subtitle', 'title', 'description', 'slug', 'created_date'], image_fields=['image'], request=request)
-        product_results = search_func(q, 'name', queryset=products, fields=['slug', 'title', 'image', 'description'], image_fields=['image'], request=request, product=True)
+        product_results = search_func(q, 'name', queryset=products, fields=['slug', 'name', 'description'], image_fields=['image'], request=request, product=True)
         cotalog_results = search_func(q, 'name', queryset=categories, fields=['name', 'id'], image_fields=['image'], request=request)
 
         res_data = {}
