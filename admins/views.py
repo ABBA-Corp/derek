@@ -369,6 +369,12 @@ class ArticleUpdate(UpdateView):
                 instance.save()
 
             meta_dict = serialize_request(MetaTags, request)
+            meta = instance.meta
+            if meta is None:
+                meta = MetaTags.objects.create()
+                instance.meta = meta
+                instance.save()
+                
             try:
                 for attr, value in meta_dict.items():
                     if str(attr) != 'id':
@@ -1789,6 +1795,17 @@ class ProductsCreate(BasedCreateView):
             product.full_clean()
             product.save()
 
+            meta_dict = serialize_request(MetaTags, request)
+            try:
+                meta = MetaTags(**meta_dict)
+                meta.full_clean()
+                meta.save()
+                product.meta = meta
+                product.save()
+            except:
+                pass
+
+            product.save()
             print(variant_list)
 
             for var_dict in variant_list:
@@ -1840,20 +1857,32 @@ class ProductEdit(UpdateView):
         instance = self.get_object()
         category_id = request.POST.get('category')
         category = Category.objects.filter(id=int(category_id))
+
         if category.exists():
             data_dict['category'] = category.first()
-        else:
-            data['request_post'] = data_dict
-            data['name_error'] = 'This field is invalid.'
-            return render(request, self.template_name, data)
+
 
         items_count = int(request.POST.get('variant_count', 0))
         old_count = instance.variants.count()
-        new_items_count = items_count - old_count
-
+        
         for attr, value in data_dict.items():
             setattr(instance, attr, value)
         instance.save()
+
+        meta_dict = serialize_request(MetaTags, request)
+        try:
+            meta = instance.meta
+            if meta is None:
+                meta = MetaTags.objects.create()
+                instance.meta = meta
+                instance.save()
+
+            for attr, value in meta_dict.items():
+                if str(attr) != 'id':
+                    setattr(meta, attr, value)
+            instance.meta.save()
+        except:
+            pass
         
         old_vars = get_variants_list(request, range(1, old_count+1))
         for vars in old_vars:

@@ -109,6 +109,20 @@
                                     {{ object.description|get_item:lang.code }} 
                                 {% endif %}</textarea>
                         </div>
+                        <div class="col-12">
+                            <h2 class="">SEO теги</h2>
+                            <hr>
+                            <div class="form-group">
+                                <label for="meta_desc" class="form-label">Мета описание</label>
+                                <input type="text" class="form-control " disabled 
+                                {% if object.meta and object.meta.meta_deck|get_item:lang.code %} value="{{ object.meta.meta_deck|get_item:lang.code }}" {% endif %} placeholder="Мета описание">
+                            </div>
+                            <div class="form-group">
+                                <label for="meta_keywords" class="form-label">Мета ключи</label>
+                                <input type="text" class="form-control " disabled 
+                                {% if object.meta and object.meta.meta_keys|get_item:lang.code %} value="{{ object.meta.meta_keys|get_item:lang.code }}" {% endif %} placeholder="Мета ключи">
+                            </div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -164,7 +178,7 @@
                                 </div>
                                 <div class="input_box">
                                     <label for="price">Цена</label>
-                                    <input type="number" class="form-control" value="{{ variant.price }}" disabled>
+                                    <input type="text" class="form-control" value="{{ variant.price }}" disabled>
                                 </div>
                                 <div class="input_box">
                                     <label for="color">Артикул</label>

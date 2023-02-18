@@ -77,7 +77,7 @@ class BasedModelSerializer(serializers.BaseSerializer):
 
     
         for image in image_fields:
-            data_dict[image] = ThumbnailSerializer(instance=instance.get(image), alias='product_photo', context={'request': self.context.get("request")}).data
+            data_dict[image] = ThumbnailSerializer(instance=instance.get(image), alias='prod_photo', context={'request': self.context.get("request")}).data
 
         
         

@@ -11,6 +11,7 @@ import string
 import random
 from admins.models import unique_slug_generator
 import cyrtranslit
+from admins.models import MetaTags
 # Create your models here.
 
 
@@ -65,6 +66,7 @@ class Products(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     description = models.JSONField('Descr', blank=True, null=True)
     active = models.BooleanField('Active', default=True)
+    meta = models.ForeignKey(MetaTags, on_delete=models.CASCADE, blank=True, null=True)
 
     def save(self, *args, **kwargs):  # new
         if not self.slug:

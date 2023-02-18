@@ -82,6 +82,37 @@
                         Опции
                     </label>
                     <br>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    {% for lang in langs %}
+                                    <th scope="col">{{ lang.code }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Mark</td>
+                                    <td>Otto</td>
+                                    <td>@mdo</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>Jacob</td>
+                                    <td>Thornton</td>
+                                    <td>@fat</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>Larry</td>
+                                    <td>the Bird</td>
+                                    <td>@twitter</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <input name='options' class="form-control"
                     {% if object and object.options.all %} value="{% for opt in object.options.all %} {{ opt.name }}, {% endfor %}" 
                     {% elif request_post and request_post|get_item:'options' %}
