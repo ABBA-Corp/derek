@@ -7,10 +7,10 @@ from easy_thumbnails.templatetags.thumbnail import thumbnail_url, get_thumbnaile
 
 @register.simple_tag
 def image_thumb(image, **kwargs):
-    alias = kwargs.get('alias')
+    alias_key = kwargs.get('alias')
     request = kwargs.get('request')
 
-    alias = settings.THUMBNAIL_ALIASES.get('').get(alias)
+    alias = settings.THUMBNAIL_ALIASES.get('').get(alias_key)
     if alias is None:
         return None
 
@@ -26,7 +26,7 @@ def image_thumb(image, **kwargs):
             url = '.'.join(last_url) + f'.{size}x{size}_q85.{last_url[-1]}'
         else:
             print('else')
-            url = get_thumbnailer(image)[alias].url
+            url = get_thumbnailer(image)[alias_key].url
 
     if url == '' or url is None:
         return None
