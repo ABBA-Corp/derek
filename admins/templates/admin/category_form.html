@@ -1,6 +1,8 @@
 {% extends 'admin/base_template.html' %}
 {% load static %}
 {% load get_item %}
+{% load image_thumb %}
+
 
 {% block title %} Категории {% endblock %}
 
@@ -169,7 +171,7 @@
                                         {% if object.image %}
                                         <div class="dz-preview dz-processing dz-complete dz-image-preview" style="position: relative;">
                                             <div class="dz-image">
-                                                <img data-dz-thumbnail="" src="{{ object.image.ten.url }}"
+                                                <img data-dz-thumbnail="" src='{% image_thumb object.image alias="ten" request=request %}'
                                                     alt="{{ object.image }}">
                                             </div>
                                             <div class="dz-details">

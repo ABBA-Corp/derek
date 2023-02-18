@@ -2,10 +2,14 @@ from django.template.defaulttags import register
 from django.core.files.storage import default_storage
 import os
 from django.conf import settings
+import json
 from easy_thumbnails.templatetags.thumbnail import thumbnail_url, get_thumbnailer
 
-@register.filter
-def image_thumb(image, alias):
+@register.simple_tag
+def image_thumb(image, **kwargs):
+    alias = kwargs.get('alias')
+    request = kwargs.get('request')
+
     alias = settings.THUMBNAIL_ALIASES.get('').get(alias)
     if alias is None:
         return None
@@ -27,8 +31,7 @@ def image_thumb(image, alias):
     if url == '' or url is None:
         return None
 
-    #request = self.context.get('request', None)
-    #if request is not None:
-    #    return request.build_absolute_uri(url)
+    if request is not None:
+        return request.build_absolute_uri(url)
 
     return url

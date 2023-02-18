@@ -1,7 +1,7 @@
 {% extends 'admin/base_template.html' %}
 {% load static %}
 {% load get_item %}
-
+{% load image_thumb %}
 
 {% block title %} Категория статей {% endblock %}
 
@@ -141,10 +141,10 @@
                                         {% if object.image %}
                                             <div class="dz-preview dz-processing dz-complete dz-image-preview" style="position: relative;">
                                                 <div class="dz-image">
-                                                    <img data-dz-thumbnail="" src="{{ object.image.ten.url }}" alt="{{ object.image }}">
+                                                    <img data-dz-thumbnail="" src='{% image_thumb object.image alias="ten" request=request %}' alt="{{ object.image }}">
                                                 </div>
                                                 <div class="dz-details">
-                                                    <div class="dz-filename"><span data-dz-name="">{{ img }}</span></div>
+                                                    <div class="dz-filename"><span data-dz-name=""></span></div>
                                                 </div>
                                                 <a class="dz-remove"
                                                     onclick="var result = confirm('Want to delete?');if (result){submit_form('delete-form{{ object.id }}')}"
