@@ -218,14 +218,16 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
 
        
         for atr in atributs:
-            variants_for_atrs = instance.product.variants.filter(color=instance.color)
             data_dict = {}
             data_dict['name'] = JsonFieldSerializer(atr.name, context={'request': self.context.get('request')}).data
             data_dict['options'] = []
 
             options_list = [it.id for it in instance.options.all() if it.atribut != atr]
+            print(options_list)
 
             for opt in atr.options.all():
+                variants_for_atrs = instance.product.variants.filter(
+                    color=instance.color)
                 options_list.append(opt.id)
 
                 for op in options_list:
@@ -240,7 +242,7 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
                     data_dict['options'].append(opt_dict)
                 
                 options_list.remove(opt.id)
-
+        
             data['atributs'].append(data_dict)
 
         
