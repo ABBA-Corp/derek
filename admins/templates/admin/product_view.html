@@ -157,7 +157,7 @@
             {% for variant, i in variants.pairs %}
             <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5">
                 <div class="blog_container">
-                    <span class="delete_variant_btn no-ajax"onclick="var result = confirm('Want to delete?');if (result){$('#delete-form{{ variant.id }}').submit()}">&#215;</span>
+                    <span class="delete_variant_btn"onclick="var result = confirm('Want to delete?');if (result){$('#delete-form{{ variant.id }}').submit()}">&#215;</span>
                     <form action="{% url 'delete' %}" id="delete-form{{ variant.id }}" method="POST" style="display: none;">
                         {% csrf_token %}
                         <input type="hidden" name="item_id" value="{{ variant.id }}">

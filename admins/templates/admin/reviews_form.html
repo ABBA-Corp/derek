@@ -1,6 +1,7 @@
 {% extends 'admin/base_template.html' %}
 {% load static %}
 {% load get_item %}
+{% load range %}
 
 {% block title %} Отзывы {% endblock %}
 
@@ -62,7 +63,7 @@
                         <div class="form-group">
                             <!-- Label  -->
                             <label {% if lang.default %} class="form-label required" {% else %} class="form-label" {% endif %}>
-                                Заголовок
+                                Имя, фамилия
                             </label>
                             <br>
                             <!-- Input -->
@@ -77,7 +78,7 @@
                         <div class="form-group">
                             <!-- Label  -->
                             <label {% if lang.default %} class="form-label required" {% else %} class="form-label" {% endif %}>
-                                Текст
+                                Текст отзыва
                             </label>
                             <br>
                             <!-- Input -->
@@ -95,9 +96,17 @@
                     </label>
                     <br>
                     <!-- Input -->
-                    <input type="number" max="5" min="1" name="rating" class="form-control" 
-                    {% if object and object.rating %} value="{{ object.rating }}" 
-                        {% elif request_post and request_post|get_item:'rating' %} value="{{ request_post|get_item:'rating' }}" {% endif %} >
+                    <select class="form-select" name="rating" id="">
+                        {% for i in 5|range %}
+                        {% if object and object.rating == i %}
+                            <option value="{{ i }}" selected>{{ i }}</option>
+                        {% elif request_post and request_post|get_item:'rating' == i %}
+                            <option value="{{ i }}" selected>{{ i }}</option>
+                        {% else %}
+                            <option value="{{ i }}">{{ i }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
                     {% if rating_error %}
                     <div class="invalid-feedback" style="display: block;">
                         {{ rating_error }}

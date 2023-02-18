@@ -29,7 +29,7 @@
     {{ some_error }}
     <input type="hidden" name="dropzone-key" value="{{ dropzone_key }}">
     <input type="hidden" name="id" value="{{ object.id }}">
-    <input type="hidden" name="options_count" value="{{ object.options.count }}">
+    <input type="hidden" name="options_count" {% if not opt_count %} value="{{ object.options.count }}" {% elif opt_count %} value="{{ opt_count }}" {% endif %}>
     <input type="hidden" name="url" value="{{ request.get_full_path }}">
     <div class="col-12 col-xl-8">
         <div class="card mt-3">
@@ -64,9 +64,11 @@
                             </label>
                             <br>
                             <!-- Input -->
+                            {{ request_post }}
                             <input type="text" name="name#{{ lang.code }}" class="form-control" 
                             {% if object and object.name|get_item:lang.code %} value="{{ object.name|get_item:lang.code }}" 
                             {% elif request_post and request_post|get_item:'name' %}
+                                {{ request_post }}
                                 value="{{ request_post|get_item:'name'|get_item:lang.code }}" {% endif %}>
                             {% if name_error and lang.default %}
                             <div class="invalid-feedback" style="display: block;">
@@ -90,6 +92,71 @@
                     {% endif %}>
                 </div>
                 <!-- Buttons -->
+                {% elif request_post %}
+                <div class="form-group">
+                    <!-- Label  -->
+                    <label class="form-label">
+                        Опции
+                    </label>
+                    <br>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    {% for lang in langs %}
+                                    <th scope="col">{{ lang.code }}</th>
+                                    {% endfor %}
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="options-tbody">
+                                {% for opt, i in options_list.pairs %}
+                                <tr>
+                                    {% for lang in langs %}
+                                    <td>
+                                        <input class="form-control" type="text" name="option[{{ lang.code }}][{{ i }}]" 
+                                        {% if opt.name|get_item:lang.code %} value="{{ opt.name|get_item:lang.code }}" {% endif %}>
+                                        {% if lang.default and error_option|get_item:i %}
+                                        <div class="invalid-feedback" style="display: block;">
+                                            {{ error_option|get_item:i }}
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    {% endfor %}
+                                    <td>
+                                        {% if opt.id %}
+                                        <div class="d-flex justify-content-end">
+                                            <a class="btn btn-sm btn-danger ms-3"
+                                                onclick="var result = confirm('Want to delete?');if (result){
+                                                    form_submit_in_table('delete-form{{ opt.id }}')
+                                                    $(`input[name='options_count']`).val(Number($('input[name=`options_count`]').val()) - 1)
+                                                    let curent_id = Number($('input[name=`options_count`]').val())
+                                                    $('.delete_variant_btn.no-ajax').last().remove()
+                                                }"><i
+                                                    class="fe fe-trash"></i></a>
+                                            <div action="{% url 'delete' %}" id="delete-form{{ opt.id }}" method="POST"
+                                                style="display: none;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="item_id" value="{{ opt.id }}">
+                                                <input type="hidden" name="model_name_del" value="AtributOptions">
+                                                <input type="hidden" name="app_name_del" value="main">
+                                                <input type="hidden" name="url" value="{{ request.get_full_path }}">
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <div class="d-flex justify-content-end">
+                                            <a class="btn btn-sm btn-danger ms-3 new_options_delete"><i class="fe fe-trash"
+                                                    style="pointer-events: none;"></i></a>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <button id="add_item" type="button" class="btn btn-info w-100 my-4">Добавить еще</button>
+                    </div>
+                </div>
                 {% elif object %}
                 <div class="form-group">
                     <!-- Label  -->
@@ -119,8 +186,11 @@
                                     <td>
                                         <div class="d-flex justify-content-end">
                                             <a class="btn btn-sm btn-danger ms-3"
-                                                onclick="var result = confirm('Want to delete?');if (result){form_submit_in_table('delete-form{{ opt.id }}')}"><i
-                                                    class="fe fe-trash"></i></a>
+                                                onclick="var result = confirm('Want to delete?');if (result){
+                                                    form_submit_in_table('delete-form{{ opt.id }}')
+                                                    $(`input[name='options_count']`).val(Number($(`input[name='options_count']`).val()) - 1)
+                                                    $('.delete_variant_btn.no-ajax').last().remove()
+                                                }"><i class="fe fe-trash"></i></a>
                                             <div action="{% url 'delete' %}" id="delete-form{{ opt.id }}" method="POST" style="display: none;">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="item_id" value="{{ opt.id }}">
@@ -163,12 +233,12 @@
         CKEDITOR.replace(txt)
     }
 
-    $('input[name="options_count"]').val(Number($('input[name="options_count"]').val()) + 1)
-    let curent_id = Number($('input[name="options_count"]').val())
-    $('.delete_variant_btn.no-ajax').last().remove()
 
 
     $('#add_item').on('click', () => {
+        $('input[name="options_count"]').val(Number($('input[name="options_count"]').val()) + 1)
+        let curent_id = Number($('input[name="options_count"]').val())
+        $('.delete_variant_btn.no-ajax').last().remove()
         document.getElementById('options-tbody').insertAdjacentHTML('beforeend', `
             <tr>
                 {% for lang in langs %}

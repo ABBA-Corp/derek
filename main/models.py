@@ -100,7 +100,7 @@ class ProductVariants(models.Model):
     slug = models.SlugField('Slug', editable=False, unique=True)
     options = models.ManyToManyField(AtributOptions, blank=True, null=True)
     image = ThumbnailerImageField(upload_to='variant_images', blank=True, null=True)
-    code = models.CharField('Code', max_length=255, unique=True)
+    code = models.CharField('Code', max_length=255)
     top = models.BooleanField('Top', default=False)
     default = models.BooleanField("Default", default=False)
 

@@ -213,7 +213,7 @@ def get_option_from_post(i, req):
 def collect_options(nbm, req):
     end_data = []
     for i in range(1, nbm+1):
-        data_dict = get_option_from_post(req, i)
+        data_dict = get_option_from_post(i, req)
         end_data.append(data_dict)
 
     return end_data

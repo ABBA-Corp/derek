@@ -1527,6 +1527,7 @@ class AtributEdit(UpdateView):
         data = self.get_context_data()
         options_count = request.POST.get("options_count", 0)
         old_count = self.get_object().options.count()
+        lang = Languages.objects.filter(default=True).first()
 
         try:
             options = collect_options(int(options_count), request)
@@ -1537,7 +1538,9 @@ class AtributEdit(UpdateView):
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
-            data['options'] = options
+            lst_one = options
+            lst_two = range(1, len(options) + 1)
+            data['options_list'] = dict(pairs=zip(lst_one, lst_two))
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
@@ -1550,24 +1553,47 @@ class AtributEdit(UpdateView):
 
 
         for i in range(1, old_count + 1):
-            data_dict = get_option_from_post(i, request)
+            opt_dict = get_option_from_post(i, request)
+
+            if opt_dict.get('name', {}).get(lang.code, '') == '':
+                data['request_post'] = data_dict
+                data['opt_count'] = len(options)
+                lst_one = options
+                lst_two = range(1, len(options) + 1)
+                data['options_list'] = dict(pairs=zip(lst_one, lst_two))
+                data['error_option'] = {}
+                data['error_option'][f'{i}'] = 'This field is required.'
+                return render(request, self.template_name, data)
+
+
 
             try:
                 option = instance.options.all()[i-1]
 
-                for attr, value in data_dict.items():
+
+                for attr, value in opt_dict.items():
                     setattr(option, attr, value)
                 option.save()
             except:
                 pass
 
 
-        for l in range(old_count + 1, int(options_count) + 1):
-            data_dict = get_option_from_post(l, request)
-            data_dict['atribut'] = instance
+        for l in range(old_count+1, int(options_count)+1):
+            opt_dict = get_option_from_post(l, request)
+            opt_dict['atribut'] = instance
+
+            if opt_dict.get('name', {}).get(lang.code, '') == '':
+                data['request_post'] = data_dict
+                data['opt_count'] = len(options)
+                lst_one = options
+                lst_two = range(1, len(options) + 1)
+                data['options_list'] = dict(pairs=zip(lst_one, lst_two))
+                data['error_option'] = {}
+                data['error_option'][f'{l}'] = 'This field is required.'
+                return render(request, self.template_name, data)
 
             try:
-                option = AtributOptions.objects.create(**data_dict)
+                option = AtributOptions.objects.create(**opt_dict)
                 option.save()
             except:
                 pass
