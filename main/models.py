@@ -128,7 +128,7 @@ class ShortApplication(models.Model):
     first_name = models.CharField('First name', max_length=255)
     last_name = models.CharField('Last name', max_length=255, blank=True, null=True)
     nbm = models.CharField('Nbm', max_length=255)
-    product = models.ForeignKey(ProductVariants, on_delete=models.SET_NULL, blank=True, null=True)
+    product = models.ForeignKey(ProductVariants, blank=True, null=True, on_delete=models.SET_NULL)
     status = models.CharField(
         'Status', default='На рассмотрении', max_length=255, choices=STATUS)
 

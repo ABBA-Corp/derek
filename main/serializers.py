@@ -59,6 +59,7 @@ def get_format_date(date):
 class BasedModelSerializer(serializers.BaseSerializer):
     def to_representation(self, instance):
         data_dict = {}
+        default_lang = Languages.objects.filter(default=True).first()
         lang = self.context.get('lang')
         fields = self.context.get("fields")
         image_fields = self.context.get("image_fields")
@@ -71,7 +72,9 @@ class BasedModelSerializer(serializers.BaseSerializer):
                 continue
 
             try: 
-                data_dict[field] = instance.get(field).get(lang)
+                data = instance.get(field).get(lang)
+                if data is None or data == '':
+                    data = instance.get(field, {}).get(default_lang)
             except:
                 data_dict[field] = instance.get(field, None)
 
@@ -371,4 +374,7 @@ class ShortApplicationSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['full_name'] = instance.get_full_name()
+        product_serializer = ProductVariantSimpleSerializer(instance.product, context={'request': self.context.get("request")})
+        data['product'] = product_serializer.data
+
         return data

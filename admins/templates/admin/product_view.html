@@ -156,7 +156,7 @@
     <div class="col-12 col-xl-12" style="padding-bottom: 30px;">
         <span id="products_variant_container">
             {% for variant, i in variants.pairs %}
-            <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5">
+            <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5" id="option[{{variant.id}}]">
                 <div class="blog_container">
                     <span class="delete_variant_btn"onclick="var result = confirm('Want to delete?');if (result){$('#delete-form{{ variant.id }}').submit()}">&#215;</span>
                     <form action="{% url 'delete' %}" id="delete-form{{ variant.id }}" method="POST" style="display: none;">
@@ -179,7 +179,7 @@
                                 </div>
                                 <div class="input_box">
                                     <label for="price">Цена</label>
-                                    <input type="text" class="form-control" value="{{ variant.price }}" disabled>
+                                    <input type="number" step="any" class="form-control" value="{{ variant.price }}" disabled>
                                 </div>
                                 <div class="input_box">
                                     <label for="color">Артикул</label>

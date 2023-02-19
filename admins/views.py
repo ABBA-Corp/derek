@@ -1011,6 +1011,7 @@ class ShortApplicationUpdate(UpdateView):
         context = super(ShortApplicationUpdate,
                         self).get_context_data(**kwargs)
         context['statuses'] = ["На рассмотрении", "Рассмотрено", "Отклонено"]
+        context['lang'] = Languages.objects.filter(default=True).first()
 
         return context
 
@@ -1471,21 +1472,49 @@ class AtributsCreate(BasedCreateView):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
         data = self.get_context_data()
-        options = json.loads(request.POST.get('options', "[]"))
-        opt_list = [opt.get('value', '') for opt in options]
+        options_count = request.POST.get("options_count", 0)
+        lang = Languages.objects.filter(default=True).first()
+
+        try:
+            options = collect_options(int(options_count), request)
+        except:
+            options = collect_options(0, request)
 
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
-            data['request_post']['options'] = opt_list
+            lst_one = options
+            lst_two = range(1, len(options) + 1)
+            data['options_list'] = dict(pairs=zip(lst_one, lst_two))
             data['name_error'] = 'This field is required.'
             return render(request, self.template_name, data)
+
 
         try:
             atribut = Atributs(**data_dict)
             atribut.full_clean()
             atribut.save()
 
-            lang = Languages.objects.filter(active=True).filter(default=True)
+            for l in range(1, int(options_count)+1):
+                opt_dict = get_option_from_post(l, request)
+                opt_dict['atribut'] = atribut
+
+                if opt_dict.get('name', {}).get(lang.code, '') == '':
+                    data['request_post'] = data_dict
+                    data['opt_count'] = len(options)
+                    lst_one = options
+                    lst_two = range(1, len(options) + 1)
+                    data['options_list'] = dict(pairs=zip(lst_one, lst_two))
+                    data['error_option'] = {}
+                    data['error_option'][f'{l}'] = 'This field is required.'
+                    return render(request, self.template_name, data)
+
+                try:
+                    option = AtributOptions.objects.create(**opt_dict)
+                    option.save()
+                except:
+                    pass
+
+            '''lang = Languages.objects.filter(active=True).filter(default=True)
 
             if lang.exists():
                 for opt in options:
@@ -1493,7 +1522,7 @@ class AtributsCreate(BasedCreateView):
 
                     options = AtributOptions.objects.create(
                         atribut=atribut, name=opt_name)
-                    options.save()
+                    options.save()'''
         except:
             pass
 

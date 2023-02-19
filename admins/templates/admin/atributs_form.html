@@ -29,7 +29,7 @@
     {{ some_error }}
     <input type="hidden" name="dropzone-key" value="{{ dropzone_key }}">
     <input type="hidden" name="id" value="{{ object.id }}">
-    <input type="hidden" name="options_count" {% if not opt_count %} value="{{ object.options.count }}" {% elif opt_count %} value="{{ opt_count }}" {% endif %}>
+    <input type="hidden" name="options_count" {% if not opt_count and object %} value="{{ object.options.count }}" {% elif opt_count %} value="{{ opt_count }}" {% else %} value="1" {% endif %}>
     <input type="hidden" name="url" value="{{ request.get_full_path }}">
     <div class="col-12 col-xl-8">
         <div class="card mt-3">
@@ -78,21 +78,6 @@
                         </div>
                     </div>
                 {% endfor %}
-                {% if not object %}
-                <div class="form-group">
-                    <!-- Label  -->
-                    <label class="form-label">
-                        Опции
-                    </label>
-                    <br>
-                    <input name='options' class="form-control"
-                    {% if object and object.options.all %} value="{% for opt in object.options.all %} {{ opt.name }}, {% endfor %}" 
-                    {% elif request_post and request_post|get_item:'options' %}
-                        value="{% for opt in request_post|get_item:'options' %} {{ opt }}, {% endfor %}" 
-                    {% endif %}>
-                </div>
-                <!-- Buttons -->
-                {% elif request_post %}
                 <div class="form-group">
                     <!-- Label  -->
                     <label class="form-label">
@@ -109,6 +94,22 @@
                                     <th></th>
                                 </tr>
                             </thead>
+                            {% if not object and not request_post %}
+                            <tbody id="options-tbody">
+                                <tr>
+                                    {% for lang in langs %}
+                                    <td>
+                                        <input class="form-control" type="text" name="option[{{ lang.code }}][1]">
+                                    </td>
+                                    {% endfor %}
+                                    <td>
+                                        <div class="d-flex justify-content-end del-opt-container">
+                                            <a class="btn btn-sm btn-danger ms-3 new_options_delete local"><i class="fe fe-trash" style="pointer-events: none;"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            {% elif request_post %}
                             <tbody id="options-tbody">
                                 {% for opt, i in options_list.pairs %}
                                 <tr>
@@ -126,16 +127,13 @@
                                     <td>
                                         {% if opt.id %}
                                         <div class="d-flex justify-content-end">
-                                            <a class="btn btn-sm btn-danger ms-3"
-                                                onclick="var result = confirm('Want to delete?');if (result){
-                                                    form_submit_in_table('delete-form{{ opt.id }}')
-                                                    $(`input[name='options_count']`).val(Number($('input[name=`options_count`]').val()) - 1)
-                                                    let curent_id = Number($('input[name=`options_count`]').val())
-                                                    $('.delete_variant_btn.no-ajax').last().remove()
-                                                }"><i
-                                                    class="fe fe-trash"></i></a>
-                                            <div action="{% url 'delete' %}" id="delete-form{{ opt.id }}" method="POST"
-                                                style="display: none;">
+                                            <a class="btn btn-sm btn-danger ms-3" onclick="var result = confirm('Want to delete?');if (result){
+                                                form_submit_in_table('delete-form{{ opt.id }}')
+                                                $(`input[name='options_count']`).val(Number($('input[name=`options_count`]').val()) - 1)
+                                                let curent_id = Number($('input[name=`options_count`]').val())
+                                                $('.delete_variant_btn.no-ajax').last().remove()
+                                            }"><i class="fe fe-trash"></i></a>
+                                            <div action="{% url 'delete' %}" id="delete-form{{ opt.id }}" method="POST" style="display: none;">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="item_id" value="{{ opt.id }}">
                                                 <input type="hidden" name="model_name_del" value="AtributOptions">
@@ -153,27 +151,7 @@
                                 </tr>
                                 {% endfor %}
                             </tbody>
-                        </table>
-                        <button id="add_item" type="button" class="btn btn-info w-100 my-4">Добавить еще</button>
-                    </div>
-                </div>
-                {% elif object %}
-                <div class="form-group">
-                    <!-- Label  -->
-                    <label class="form-label">
-                        Опции
-                    </label>
-                    <br>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    {% for lang in langs %}
-                                    <th scope="col">{{ lang.code }}</th>
-                                    {% endfor %}
-                                    <th></th>
-                                </tr>
-                            </thead>
+                            {% elif object %}
                             <tbody id="options-tbody">
                                 {% for opt, i in options.pairs %}
                                 <tr>
@@ -185,12 +163,11 @@
                                     {% endfor %}
                                     <td>
                                         <div class="d-flex justify-content-end">
-                                            <a class="btn btn-sm btn-danger ms-3"
-                                                onclick="var result = confirm('Want to delete?');if (result){
-                                                    form_submit_in_table('delete-form{{ opt.id }}')
-                                                    $(`input[name='options_count']`).val(Number($(`input[name='options_count']`).val()) - 1)
-                                                    $('.delete_variant_btn.no-ajax').last().remove()
-                                                }"><i class="fe fe-trash"></i></a>
+                                            <a class="btn btn-sm btn-danger ms-3" onclick="var result = confirm('Want to delete?');if (result){
+                                                                                form_submit_in_table('delete-form{{ opt.id }}')
+                                                                                $(`input[name='options_count']`).val(Number($(`input[name='options_count']`).val()) - 1)
+                                                                                $('.delete_variant_btn.no-ajax').last().remove()
+                                                                            }"><i class="fe fe-trash"></i></a>
                                             <div action="{% url 'delete' %}" id="delete-form{{ opt.id }}" method="POST" style="display: none;">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="item_id" value="{{ opt.id }}">
@@ -203,12 +180,11 @@
                                 </tr>
                                 {% endfor %}
                             </tbody>
+                            {% endif %}
                         </table>
                         <button id="add_item" type="button" class="btn btn-info w-100 my-4">Добавить еще</button>
                     </div>
                 </div>
-                <!-- Buttons -->
-                {% endif %}
             </div>
                 <div class="btn-box text-end">
                     <a href="#" class="btn w-30 btn-secondary">
@@ -239,6 +215,7 @@
         $('input[name="options_count"]').val(Number($('input[name="options_count"]').val()) + 1)
         let curent_id = Number($('input[name="options_count"]').val())
         $('.delete_variant_btn.no-ajax').last().remove()
+        $('.new_options_delete.local').last().remove()
         document.getElementById('options-tbody').insertAdjacentHTML('beforeend', `
             <tr>
                 {% for lang in langs %}
@@ -247,12 +224,11 @@
                 </td>
                 {% endfor %}
                 <td>
-                    <div class="d-flex justify-content-end">
-                        <a class="btn btn-sm btn-danger ms-3 new_options_delete"><i class="fe fe-trash" style="pointer-events: none;"></i></a>
+                    <div class="d-flex justify-content-end del-opt-container">
+                        <a class="btn btn-sm btn-danger ms-3 new_options_delete local"><i class="fe fe-trash" style="pointer-events: none;"></i></a>
                     </div>
                 </td>
             </tr>
-        
         `)
     })
 
