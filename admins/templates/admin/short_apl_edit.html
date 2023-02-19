@@ -74,7 +74,7 @@
                 <br>
                 <!-- Input -->
                 <input type="text" name="last_name" class="form-control" {% if object.last_name %} value="{{ object.last_name }}" {% endif %}
-                    placeholder="Название..." maxlength="255" id="id_last_name" required>
+                    placeholder="Название..." maxlength="255" id="id_last_name">
                 <div class="invalid-feedback" style="display: block;">{{ form.errors.last_name }}</div>
             </div>
             <div class="form-group">

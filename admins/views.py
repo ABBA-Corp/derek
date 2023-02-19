@@ -1003,7 +1003,7 @@ class ShortApplicationList(BasedListView):
 # short application update
 class ShortApplicationUpdate(UpdateView):
     model = ShortApplication
-    fields = ['nbm', 'status']
+    fields = ['nbm', 'status', 'first_name', 'last_name']
     template_name = 'admin/short_apl_edit.html'
     success_url = '/admin/quick_applications'
 
