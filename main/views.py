@@ -183,15 +183,11 @@ class Search(views.APIView):
 
         return Response(res_data)
 
-        
-
-            
-
 
 # application add
 class NewAppliction(generics.CreateAPIView):
     serializer_class = ShortApplicationSerializer
-    queryset = ShortApplicationSerializer
+    queryset = ShortApplication.objects.all()
 
 
 
