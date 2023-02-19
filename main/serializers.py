@@ -320,12 +320,17 @@ class TranslationsSerializerBadVersion(serializers.Serializer):
     def to_representation(self, instance):
         data = {}
         languages = Languages.objects.filter(active=True)
+        def_lang = languages.filter(default=True).first()
         
         for lang in languages:
             data[lang.code] = {}
             new_data = {}
             for item in instance:
                 val = item.value.get(lang.code, '')
+
+                if val == '':
+                    val = item.value.get(def_lang.code, None)
+
                 key = str(item.key)
                 new_data[key] = val
 
