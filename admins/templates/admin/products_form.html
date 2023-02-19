@@ -2,6 +2,7 @@
 {% load static %}
 {% load get_item %}
 {% load range %}
+{% load float %}
 
 {% block css %} 
 <link rel="stylesheet" href="{% static 'assets/css/variants.css' %}">
@@ -279,7 +280,7 @@
                                         </div>
                                         <div class="input_box">
                                             <label for="price">Цена</label>
-                                            <input type="number" step="any" class="form-control" value="{{ variant.price }}" name="price[{{ i }}]" required>
+                                            <input type="number" step="any" class="form-control" value="{{ variant.price|float }}" name="price[{{ i }}]" required>
                                         </div>
                                         <div class="input_box">
                                             <label for="color">Артикул</label>
