@@ -91,9 +91,10 @@ def search_translation(query, queryset, *args, **kwargs):
     langs = Languages.objects.all()
     endlist = []
     if query and query != '':
+        query = query.lower()
         for item in queryset:
             for lang in langs:
-                if query.lower() in str(item.value[lang.code]).lower() or query.lower() in str(item.key).lower():
+                if query in str(item.value[lang.code]).lower() or query in str(item.key).lower() or query in str(item.group.sub_text + '.' + item.code).lower():
                     endlist.append(item)
                 continue
     
@@ -133,11 +134,6 @@ def get_lst_data(queryset, request, number):
 
 
     return dict(pairs=zip(lst_one, lst_two))
-
-
-
-
-
 
 
 # langs save
