@@ -1915,13 +1915,12 @@ class ProductsCreate(BasedCreateView):
                 var_dict['product'] = product
                 options = var_dict.pop('options')
                 del var_dict['i']
-
-                variant = ProductVariants.objects.create(**var_dict)
-                variant.options.set(options)
-                if variant.full_clean():
-                    variant.save()
-                else:
-                    print(variant.full_clean())
+                try:
+                    variant = ProductVariants.objects.create(**var_dict)
+                    variant.options.set(options)
+                    variant.full_clean()
+                except:
+                    pass
         except:
             pass
 
@@ -2007,13 +2006,12 @@ class ProductEdit(UpdateView):
             var['product'] = instance
             options = var.pop('options')
             del var['i']
-
-            variant = ProductVariants.objects.create(**var)
-            variant.options.set(options)
-            if variant.full_clean():
-                variant.save()
-            else:
-                print(variant.full_clean())
+            try:
+                variant = ProductVariants.objects.create(**var)
+                variant.options.set(options)
+                variant.full_clean()
+            except:
+                pass
 
         return redirect('products_detail', pk=self.get_object().pk)
 
