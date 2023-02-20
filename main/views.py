@@ -95,7 +95,7 @@ class ProductsList(generics.ListAPIView):
 
         try:
             category = Category.objects.get(id=ctg_id)
-            queryset = queryset.filter(category=category)
+            queryset = queryset.filter(product__category=category)
         except:
             pass
 
