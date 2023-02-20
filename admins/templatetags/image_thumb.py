@@ -21,11 +21,9 @@ def image_thumb(image, **kwargs):
         orig_url = image.path.split('.')
         thb_url = '.'.join(orig_url) + f'.{size}x{size}_q85.{orig_url[-1]}'
         if default_storage.exists(thb_url):
-            print("if")
             last_url = image.url.split('.')
             url = '.'.join(last_url) + f'.{size}x{size}_q85.{last_url[-1]}'
         else:
-            print('else')
             url = get_thumbnailer(image)[alias_key].url
 
     if url == '' or url is None:

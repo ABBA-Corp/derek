@@ -220,7 +220,6 @@ class ProductVariantGet(views.APIView):
                 option = AtributOptions.objects.filter(id=int(value))
 
                 if option.exists():
-                    print(option)
                     options_list.append(option.first())
                 else:
                     return Response({'detail': 'option id is invalid'})

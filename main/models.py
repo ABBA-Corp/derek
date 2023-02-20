@@ -28,7 +28,6 @@ class Colors(models.Model):
             str = cyrtranslit.to_latin(self.name.get(lng.code, '')[:50])
             slug = slugify(str)
             self.slug = unique_slug_generator(self, slug)
-            print(self.slug)
 
         return super().save(*args, **kwargs)
 

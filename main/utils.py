@@ -37,7 +37,6 @@ def search_func(q, field, queryset, fields, image_fields, request, product=False
 
             if str(src_field).lower().startswith(str(q).lower()):
                 serializer = BasedModelSerializer(instance=dct, context={"lang": lang.code, 'fields': fields, 'image_fields': image_fields, 'request': request})
-                print(serializer.data)
                 results.append(serializer.data)
                 
 

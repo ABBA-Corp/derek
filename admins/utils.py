@@ -169,9 +169,6 @@ def is_valid_field(data, field):
     except:
         return False
 
-    print(val == '')
-    print('!!!!', val != '')
-
     return val != ''
 
 
@@ -198,7 +195,6 @@ def required_field_validate(fields: list, data):
 
 # get option from request
 def get_option_from_post(i, req):
-    print(req)
     langs = Languages.objects.filter(active=True)
     data_dict = {}
     for lang in langs:

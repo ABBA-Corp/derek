@@ -295,7 +295,7 @@ class ArticleCreateView(BasedCreateView):
             article.save()
 
         except ValidationError:
-            print(ValidationError)
+            pass
 
         return redirect('articles_list')  # redirect("")
 
@@ -384,7 +384,7 @@ class ArticleUpdate(UpdateView):
                 pass
 
         except ValidationError:
-            print(ValidationError)
+            pass
 
         return redirect('articles_list')
 
@@ -1563,8 +1563,6 @@ class AtributEdit(UpdateView):
         except:
             options = collect_options(0, request)
 
-        print(options)
-
         if is_valid_field(data_dict, 'name') == False:
             data['request_post'] = data_dict
             lst_one = options
@@ -1778,7 +1776,6 @@ def get_variants_list(request, range):
         data_dict['code'] = request.POST.get(f'code[{i}]')
 
         option_ids = request.POST.getlist(f'option[{i}]')
-        print(option_ids)
 
         data_dict['options'] = []
         for it in option_ids:
@@ -1909,7 +1906,6 @@ class ProductsCreate(BasedCreateView):
                 pass
 
             product.save()
-            print(variant_list)
 
             for var_dict in variant_list:
                 var_dict['product'] = product
@@ -2000,8 +1996,6 @@ class ProductEdit(UpdateView):
                 pass
 
         new_vars = get_variants_list(request, range(old_count+1, items_count + 1))
-        print(range(old_count+1, items_count + 1))
-        print('!!!!', new_vars)
         for var in new_vars:
             var['product'] = instance
             options = var.pop('options')
