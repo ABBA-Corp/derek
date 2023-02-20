@@ -95,7 +95,7 @@ urlpatterns = [
     path("colors/<int:pk>/edit", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ColorEdit.as_view()), name='colors_edit'),
     path("products", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ProductsList.as_view()), name='products_list'),
     path('products/create', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ProductsCreate.as_view()), name='products_create'),
-    path('products/<int:pk>&', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ProductsDetailView.as_view()), name='products_detail'),
+    path('products/<int:pk>', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ProductsDetailView.as_view()), name='products_detail'),
     path('products/<int:pk>/edit', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ProductEdit.as_view()), name='products_edit'),
     path("get_ctg_atributs", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.get_ctg_atributs), name='get_ctg_atributs'),
     
