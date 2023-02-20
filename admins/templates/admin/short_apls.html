@@ -41,6 +41,9 @@
                         <a class="list-sort text-muted">Номер</a>
                     </th>
                     <th>
+                        <a class="list-sort text-muted">Продукт</a>
+                    </th>
+                    <th>
                         <a class="list-sort text-muted">Статус</a>
                     </th>
                     <th style="width: 200px;"></th>
@@ -61,6 +64,47 @@
                         <p class="item-phone text-reset">
                             {{ obj.nbm }}
                         </p>
+                    </td>
+                    <td>
+                        {% if obj.product %}
+                            <div class="form-group">
+                                <!-- Label  -->
+                                <label class="form-label">
+                                    Продукт
+                                </label>
+                                <br>
+                                <!-- Input -->
+                                <div class="list-group list-group-flush list-group-focus product-card">
+                                    <a class="list-group-item"
+                                        href="/admin/products/{{ object.product.product.id }}#option[{{ object.product.id }}]">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <!-- Avatar -->
+                                                <div class="avatar">
+                                                    {% if obj.product.image %}
+                                                    <img class="avatar" src='{% image_thumb object.product.image alias="ten" request=request %}'
+                                                        alt="...">
+                                                    {% else %}
+                                                    <img class="avatar" src="{% static 'src/img/default.png' %}" alt="...">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col ms-n2">
+                                                <!-- Title -->
+                                                <h4 class="text-body text-focus mb-1 name">
+                                                    {{ obj.product.product.name|get_item:lang.code }}
+                                                </h4>
+                                                <p class="small text-muted mb-0">
+                                                    <span class="fe fe-dollar-sign"></span>
+                                                    {{ obj.product.price }}
+                                                </p>
+                                            </div>
+                                        </div> <!-- / .row -->
+                                    </a>
+                                </div>
+                            </div>
+                            <br><br>
+                        {% endif %}
                     </td>
                     <td>
                         <p class="item-status text-reset">
