@@ -92,7 +92,7 @@ $(document).on('change', '.is_default', (e) => {
 })
 
 
-$(document).on('change', '.ctg_select', () => {
+$(document).on('change', 'select.ctg_select', () => {
     console.log('9')
     document.querySelector('.messages').insertAdjacentHTML('beforeEnd', '<div class="alert alert-danger message" role="alert"> Внимание! При изменении категории все добавленные вами ранее вариации будут удалены! </div>')
     
