@@ -82,7 +82,7 @@
                                                 <!-- Avatar -->
                                                 <div class="avatar">
                                                     {% if obj.product.image %}
-                                                    <img class="avatar" src='{% image_thumb object.product.image alias="ten" request=request %}'
+                                                    <img class="avatar" src='{% image_thumb obj.product.image alias="ten" request=request %}'
                                                         alt="...">
                                                     {% else %}
                                                     <img class="avatar" src="{% static 'src/img/default.png' %}" alt="...">
