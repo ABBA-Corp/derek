@@ -98,6 +98,7 @@ urlpatterns = [
     path('products/<int:pk>', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ProductsDetailView.as_view()), name='products_detail'),
     path('products/<int:pk>/edit', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.ProductEdit.as_view()), name='products_edit'),
     path("get_ctg_atributs", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.get_ctg_atributs), name='get_ctg_atributs'),
+    path('partner_image_delete',  user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.delete_partner_image), name='del_partner_img')
     
 
     #path("fill_db_qwertyuiop", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.fill_db_view))

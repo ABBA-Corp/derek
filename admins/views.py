@@ -2044,6 +2044,16 @@ def get_ctg_atributs(request):
     return JsonResponse(serializer.data, safe=False)
 
 
+# delete partner video
+def delete_partner_image(request):
+    pk = request.POST.get("obj_id")
+
+    try:
+        Partners.objects.get(id=pk).image.delete()
+    except:
+        pass
+
+    return JsonResponse('success', safe=False)
 
 
 # FIX: Search, application in frontend
