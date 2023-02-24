@@ -72,7 +72,10 @@
                         <a class="list-sort text-muted" data-sort="item-name" href="#">Заголовок</a>
                     </th>
                     <th>
-                        <span class="text-muted" data-sort="item-title">Дата</span>
+                        <span class="text-muted">Дата</span>
+                    </th>
+                    <th>
+                        <span class="text-muted">Активный</span>
                     </th>
                     <th style="width: 200px;"></th>
                 </tr>
@@ -99,6 +102,13 @@
                     <td>
                         <!-- Text -->
                         <span class="item-title">{{ obj.get_dot_date }}</span>
+                    </td>
+                    <td>
+                        {% if lang.active %}
+                        <span class="badge bg-success-soft">Active</span>
+                        {% else %}
+                        <span class="badge bg-danger-soft">Inactive</span>
+                        {% endif %}
                     </td>
                     <td>
                         <div class="d-flex justify-content-end">
