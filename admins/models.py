@@ -146,12 +146,10 @@ class Articles(models.Model):
     image = ThumbnailerImageField(upload_to='article_images', blank=True, null=True)
     title = models.JSONField('Заголовок')
     slug = models.SlugField('Slug', editable=False, unique=True)
-    subtitle = models.JSONField('Пост заголовок')
     body = models.JSONField("Статья")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='articles')
     created_date = models.DateField()
     active = models.BooleanField(default=True)
-    category = models.ManyToManyField(ArticleCategories, blank=True, null=True, related_name='articles')
     meta = models.ForeignKey(MetaTags, on_delete=models.CASCADE, blank=True, null=True)
 
 

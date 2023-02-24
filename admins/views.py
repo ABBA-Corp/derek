@@ -243,7 +243,6 @@ class ArticleCreateView(BasedCreateView):
     model = Articles
     template_name = 'admin/new_article.html'
     success_url = 'articles_list'
-    related_model = ArticleCategories
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
@@ -252,7 +251,6 @@ class ArticleCreateView(BasedCreateView):
             'created_date', str(datetime.date.today()))
         data_dict['author'] = request.user
         key = request.POST.get('dropzone-key')
-        categories = request.POST.getlist('categories[]')
 
         data = self.get_context_data()
 
@@ -265,10 +263,6 @@ class ArticleCreateView(BasedCreateView):
             article = Articles(**data_dict)
             article.full_clean()
             article.save()
-            if categories:
-                ctg_queryset = [ArticleCategories.objects.get(
-                    id=int(it)) for it in categories]
-                article.category.set(ctg_queryset)
 
             key = self.model._meta.verbose_name
             sess_images = request.session.get(key)
@@ -328,7 +322,6 @@ class ArticleUpdate(UpdateView):
     def post(self, request, *args, **kwargs):
         context = super().post(request, *args, **kwargs)
         data_dict = serialize_request(self.model, request)
-        url = request.POST.get("url")
         key = self.model._meta.verbose_name
 
         data = self.get_context_data()
@@ -342,7 +335,6 @@ class ArticleUpdate(UpdateView):
                 key, []) if it['id'] == str(self.get_object().pk)][0]
         except:
             file = None
-        categories = request.POST.getlist('categories[]')
 
         try:
             instance = self.get_object()
@@ -351,11 +343,6 @@ class ArticleUpdate(UpdateView):
                 setattr(instance, attr, value)
 
             instance.save()
-
-            if categories:
-                ctg_queryset = [ArticleCategories.objects.get(
-                    id=int(it)) for it in categories]
-                instance.category.set(ctg_queryset)
 
             if file:
                 instance.image = file['name']
