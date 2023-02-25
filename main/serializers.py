@@ -253,7 +253,6 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
 # articles
 class ArticleSerializer(serializers.ModelSerializer):
     title = JsonFieldSerializer()
-    subtitle = JsonFieldSerializer()
     body = JsonFieldSerializer()
     created_date = serializers.DateField(format="%d.%m.%Y")
     image = ThumbnailSerializer(alias='prod_photo')
@@ -268,7 +267,6 @@ class ArticleSerializer(serializers.ModelSerializer):
 # article detail serializer
 class ArticleDetailSerializer(serializers.ModelSerializer):
     title = JsonFieldSerializer()
-    subtitle = JsonFieldSerializer()
     body = JsonFieldSerializer()
     created_date = serializers.DateField(format="%d.%m.%Y")
     image = ThumbnailSerializer(alias='original')
