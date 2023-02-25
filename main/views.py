@@ -171,14 +171,14 @@ class Search(views.APIView):
         categories = Category.objects.all()
         articles = Articles.objects.filter(active=True)
 
-        articles_results = search_func(q, 'title', queryset=articles, fields=['subtitle', 'title', 'description', 'slug', 'created_date'], image_fields=['image'], request=request)
-        product_results = search_func(q, 'name', queryset=products, fields=['slug', 'name', 'description'], image_fields=['image'], request=request, product=True)
-        cotalog_results = search_func(q, 'name', queryset=categories, fields=['name', 'id'], image_fields=['image'], request=request)
+        articles_results = search_func(q,  queryset=articles, fields=['subtitle', 'title'])
+        product_results = search_func(q, queryset=products, fields=['name'])
+        cotalog_results = search_func(q, queryset=categories, fields=['name'])
 
         res_data = {}
-        res_data['products'] = product_results
-        res_data['categories'] = cotalog_results
-        res_data['articles'] = articles_results
+        res_data['products'] = ProductsSerializer(product_results, context={'request': request}).data
+        res_data['categories'] = Categoryserializer(cotalog_results, context={'request': request}).data
+        res_data['articles'] = ArticleSerializer(articles_results, context={'request': request}).data
 
 
         return Response(res_data)

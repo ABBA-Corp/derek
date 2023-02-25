@@ -17,29 +17,25 @@ def translator(word: str, lang: str = None):
 
     
 # search for api
-def search_func(q, field, queryset, fields, image_fields, request, product=False):
+def search_func(query, queryset, fields):
+    if query == '':
+        return queryset
+
     langs = Languages.objects.filter(active=True)
-    results = []
+    query_str = ''
+    if langs.exists():
+        for lang in langs:
+            query_str += f'"$.{lang.code}",'
 
-    for lang in langs:
-        for item in queryset:
-            dct = item.__dict__
-            if product:
-                src_field = item.product.__dict__.get(field).get(lang.code)
-                if item.product.name:
-                    dct['name'] = item.product.name.get(lang.code, None)
-                if item.product.description:
-                    dct['description'] = item.product.description.get(lang.code, None)
-            else:
-                src_field = item.__dict__.get(field).get(lang.code)
-                
-            
+        end_set = set()
+        for field in fields:
+            qs = queryset.extra(where=[f'LOWER({field} ::varchar) LIKE %s'], params=[f'%{query.lower()}%'])
+            for item in qs:
+                end_set.add(item)
 
-            if str(src_field).lower().startswith(str(q).lower()):
-                serializer = BasedModelSerializer(instance=dct, context={"lang": lang.code, 'fields': fields, 'image_fields': image_fields, 'request': request})
-                results.append(serializer.data)
+        return list(end_set)
                 
 
-    return results
+    return []
                 
         
