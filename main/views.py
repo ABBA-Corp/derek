@@ -167,7 +167,7 @@ class Search(views.APIView):
         if q == '':
             return Response({'error': 'q param is required'})
         
-        products = ProductVariants.objects.select_related('product').filter(product__active=True).filter(default=True)
+        products = ProductVariants.objects.select_related('product').filter(product__active=True).filter(default=True).filter()
         categories = Category.objects.all()
         articles = Articles.objects.filter(active=True)
 
