@@ -171,7 +171,7 @@ class Search(views.APIView):
         categories = Category.objects.all()
         articles = Articles.objects.filter(active=True)
 
-        articles_results = search_func(q,  queryset=articles, fields=['subtitle', 'title'])
+        articles_results = search_func(q,  queryset=articles, fields=['title'])
         product_results = search_func(q, queryset=products, fields=['name'])
         cotalog_results = search_func(q, queryset=categories, fields=['name'])
 
