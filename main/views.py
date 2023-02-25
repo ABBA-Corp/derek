@@ -176,9 +176,9 @@ class Search(views.APIView):
         cotalog_results = search_func(q, queryset=categories, fields=['name'])
 
         res_data = {}
-        res_data['products'] = ProductVariantSimpleSerializer(product_results, context={'request': request}).data
-        res_data['categories'] = Categoryserializer(cotalog_results, context={'request': request}).data
-        res_data['articles'] = ArticleSerializer(articles_results, context={'request': request}).data
+        res_data['products'] = ProductVariantSimpleSerializer(product_results, many=True, context={'request': request}).data
+        res_data['categories'] = Categoryserializer(cotalog_results, many=True, context={'request': request}).data
+        res_data['articles'] = ArticleSerializer(articles_results, many=True, context={'request': request}).data
 
 
         return Response(res_data)
