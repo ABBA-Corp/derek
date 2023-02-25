@@ -27,22 +27,23 @@ class BasedListView(ListView):
     def search(self, queryset, fields: list, model, *args, **kwargs):
         query = self.request.GET.get("q", '')
 
+        langs = Languages.objects.filter(active=True)
+        endlist = list()
+
         if query == '':
             return queryset
 
-        langs = Languages.objects.filter(active=True)
-        query_str = ''
-        if langs.exists():
-            for lang in langs:
-                query_str += f'"$.{lang.code}",'
+        queryset = queryset.values()
 
-            end_set = set()
-            for field in fields:
-                qs = queryset.extra(where=[f'lower(JSON_EXTRACT({field}, {query_str[:-1]})) LIKE %s'], params=[f'%{query.lower()}%'])
-                for item in qs:
-                    end_set.add(item)
+        for field in fields:
+            for item in queryset:
+                for lang in langs:
+                    if query.lower() in str(item.get(field, {}).get(lang.code, '')).lower():
+                        if item['id'] not in [it['id'] for it in endlist]:
+                            endlist.append(item)
+                    continue
 
-            queryset = list_to_queryset(list(end_set))
+        queryset = list_of_dicts_to_queryset(endlist, model)
 
         return queryset
 
