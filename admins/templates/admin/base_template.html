@@ -22,6 +22,13 @@
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
 
+    <style>
+        .dz-image img {
+            object-fit: cover !important;
+            width: 100% !important;
+        }
+    </style>
+
     <!-- Title -->
     <title>{% block title %} {% endblock %}</title>
 
