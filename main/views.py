@@ -45,7 +45,7 @@ class StaticInfView(views.APIView):
 class TranslationsView(views.APIView):
     def get(self, request, fromat=None):
         translations = Translations.objects.all()
-        serializer = TranslationsSerializerBadVersion(translations, context={'request': request})
+        serializer = TranslationSerializer(translations, context={'request': request})
         return Response(serializer.data)
 
 
