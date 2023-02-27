@@ -81,6 +81,8 @@ urlpatterns = [
     path('del_ctg_files', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.del_category_file), name='del_ctg_file'),
     path('atributs', user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.AtributsList.as_view()), name='atr_list'),
     path("atributs/create", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.AtributsCreate.as_view()), name='atr_create'),
+    path("atributs/<int:pk>", user_passes_test(lambda u: u.is_superuser,
+         login_url='login_admin')(views.AtributsDetailView.as_view()), name='atribut_detail'),
     path("atributs/<int:pk>/edit", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.AtributEdit.as_view()), name='atribut_edit'),
     path("atribut_options/edit", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.AtributOptionEdit.as_view()), name='atr_options_edit'),
     path("atribut_options/get", user_passes_test(lambda u: u.is_superuser, login_url='login_admin')(views.get_option), name='get_atr_option'),

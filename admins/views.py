@@ -1516,6 +1516,23 @@ class AtributsCreate(BasedCreateView):
         return redirect("atr_list")
 
 
+# atributs detail view
+class AtributsDetailView(DetailView):
+    model = Atributs
+    template_name = 'admin/atributs_view.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AtributsDetailView, self).get_context_data(**kwargs)
+        context['langs'] = Languages.objects.filter(active=True).order_by('-default')
+        context['lang'] = Languages.objects.filter(default=True).first()
+
+        lst_one = self.get_object().options.all()
+        lst_two = range(1, lst_one.count() + 1)
+        context['options'] = dict(pairs=zip(lst_one, lst_two))
+
+        return context
+
+
 # atributs edit
 class AtributEdit(UpdateView):
     model = Atributs

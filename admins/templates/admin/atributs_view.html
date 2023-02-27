@@ -1,0 +1,185 @@
+{% extends 'admin/base_template.html' %}
+{% load static %}
+{% load get_item %}
+
+{% block title %} Атрибуты {% endblock %}
+
+
+{% block page_title %} Атрибуты {% endblock %}
+
+
+{% block nav_ol %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item ">
+        <a href="{% url 'atr_list' %}">Атрибуты</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
+        Создать
+    </li>
+    <li style="position: absolute;right: 20px;">
+        <div class="btn-box text-end">
+            <a href="{% url 'atribut_edit' object.id %}" class="d-flex"
+                style="width: max-content;text-decoration: underline;"><i
+                    class="fe fe-edit-2 d-flex align-items-center justify-content-center"
+                    style="width: 20px;height:20px"></i>
+                редактировать</a>
+        </div>
+    </li>
+</ol>
+{% endblock %}
+
+{% block content_width %} class="col-12" {% endblock %}
+
+
+{% block content %}
+<div class="row">
+    {% csrf_token %}
+    {{ some_error }}
+    <div class="col-12 col-xl-8">
+        <div class="card mt-3">
+            <div class="crd-header p-4 pb-0">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    {% for lang in langs %}
+                    {% if lang == langs.first %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-3 py-2 active" id="tab_{{ lang.id }}" data-bs-toggle="tab"
+                            data-bs-target="#{{ lang.code }}" type="button" role="tab" aria-controls="{{ lang.code }}"
+                            aria-selected="true">{{ lang.name }}</button>
+                    </li>
+                    {% else %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-3 py-2" id="tab_{{ lang.id }}" data-bs-toggle="tab"
+                            data-bs-target="#{{ lang.code }}" type="button" role="tab" aria-controls="{{ lang.code }}"
+                            aria-selected="false">{{ lang.name }}</button>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card-bodyb p-5">
+                <div class="tab-content" id="myTabContent">
+                    {% for lang in langs %}
+                    <div {% if lang == langs.first %} class="tab-pane fade show active" {% else %} class="tab-pane fade"
+                        {% endif %} id="{{ lang.code }}" role="tabpanel" aria-labelledby="{{ lang.code }}">
+                        <div class="form-group">
+                            <!-- Label  -->
+                            <label {% if lang.default %} class="form-label required" {% else %} class="form-label" 
+                            {% endif %}>
+                                Название
+                            </label>
+                            <br>
+                            <!-- Input -->
+                            <input type="text" name="name#{{ lang.code }}" class="form-control" 
+                            {% if object and object.name|get_item:lang.code %} value="{{ object.name|get_item:lang.code }}" 
+                            {% elif request_post and request_post|get_item:'name' %} {{ request_post }}
+                                value="{{ request_post|get_item:'name'|get_item:lang.code }}" {% endif %}>
+                            {% if name_error and lang.default %}
+                            <div class="invalid-feedback" style="display: block;">
+                                {{ name_error }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <!-- Label  -->
+                        <label class="form-label">
+                            Опции
+                        </label>
+                        <br>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        {% for lang in langs %}
+                                        <th scope="col">{{ lang.code }}</th>
+                                        {% endfor %}
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="options-tbody">
+                                    {% for opt, i in options.pairs %}
+                                    <tr>
+                                        {% for lang in langs %}
+                                        <td>
+                                            <input class="form-control" type="text"
+                                                name="option[{{ lang.code }}][{{ i }}]" 
+                                                {% if opt.name|get_item:lang.code %} value="{{ opt.name|get_item:lang.code }}"
+                                                {% endif %}>
+                                        </td>
+                                        {% endfor %}
+                                        <td>
+                                            <div class="d-flex justify-content-end">
+                                                <a class="btn btn-sm btn-danger ms-3" onclick="var result = confirm('Want to delete?');if (result){
+                                                $('#delete-form{{ opt.id }}').submit()
+                                                $(`input[name='options_count']`).val(Number($(`input[name='options_count']`).val()) - 1)
+                                                $('.delete_variant_btn.no-ajax').last().remove()
+                                            }"><i class="fe fe-trash"></i></a>
+                                                <form action="{% url 'delete' %}" id="delete-form{{ opt.id }}"
+                                                    method="POST" style="display: none;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="item_id" value="{{ opt.id }}">
+                                                    <input type="hidden" name="model_name_del" value="AtributOptions">
+                                                    <input type="hidden" name="app_name_del" value="main">
+                                                    <input type="hidden" name="url" value="{{ request.get_full_path }}">
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-box text-end">
+                    <a href="{% url 'atribut_edit' object.id %}" class="d-flex p-1 mt-4"
+                        style="width: max-content;text-decoration: underline;"><i
+                            class="fe fe-edit-2 d-flex align-items-center justify-content-center" style="width: 20px;height:20px"></i>
+                        редактировать</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var inputs = document.querySelectorAll('input[name=options]');
+    for (let inp of inputs) {
+        new Tagify(inp)
+    }
+
+    // initialize Tagify on the above input node reference
+
+
+    for (let txt of document.querySelectorAll('.editor')) {
+        CKEDITOR.replace(txt)
+    }
+
+
+
+    $('#add_item').on('click', () => {
+        $('input[name="options_count"]').val(Number($('input[name="options_count"]').val()) + 1)
+        let curent_id = Number($('input[name="options_count"]').val())
+        $('.delete_variant_btn.no-ajax').last().remove()
+        $('.new_options_delete.local').last().remove()
+        document.getElementById('options-tbody').insertAdjacentHTML('beforeend', `
+            <tr>
+                {% for lang in langs %}
+                <td>
+                    <input class="form-control" type="text" name="option[{{ lang.code }}][${curent_id}]">
+                </td>
+                {% endfor %}
+                <td>
+                    <div class="d-flex justify-content-end del-opt-container">
+                        <a class="btn btn-sm btn-danger ms-3 new_options_delete local"><i class="fe fe-trash" style="pointer-events: none;"></i></a>
+                    </div>
+                </td>
+            </tr>
+        `)
+    })
+
+</script>
+<script src="{% static 'assets/js/atributs_edit.js' %}"></script>
+<!-- Form -->
+{% endblock %}
