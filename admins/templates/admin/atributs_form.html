@@ -75,82 +75,87 @@
                             {% endif %}
                         </div>
                     </div>
-                {% endfor %}
-                <div class="form-group">
-                    <!-- Label  -->
-                    <label class="form-label">
-                        Опции
-                    </label>
-                    <br>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    {% for lang in langs %}
-                                    <th scope="col">{{ lang.code }}</th>
+                    {% endfor %}
+                    <div class="form-group">
+                        <!-- Label  -->
+                        <label class="form-label">
+                            Опции
+                        </label>
+                        <br>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        {% for lang in langs %}
+                                        <th scope="col">{{ lang.code }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                {% if not object and not request_post %}
+                                <tbody id="options-tbody">
+                                    <tr>
+                                        {% for lang in langs %}
+                                        <td>
+                                            <input class="form-control" type="text" name="option[{{ lang.code }}][1]">
+                                        </td>
+                                        {% endfor %}
+                                        <td>
+                                            <div class="d-flex justify-content-end del-opt-container">
+                                                <a class="btn btn-sm btn-danger ms-3 new_options_delete local"><i
+                                                        class="fe fe-trash" style="pointer-events: none;"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                {% elif request_post %}
+                                <tbody id="options-tbody">
+                                    {% for opt, i in options_list.pairs %}
+                                    <tr>
+                                        {% for lang in langs %}
+                                        <td>
+                                            <input class="form-control" type="text"
+                                                name="option[{{ lang.code }}][{{ i }}]" 
+                                                {% if opt.name|get_item:lang.code %} value="{{ opt.name|get_item:lang.code }}"
+                                                {% endif %}>
+                                            {% if lang.default and error_option|get_item:i %}
+                                            <div class="invalid-feedback" style="display: block;">
+                                                {{ error_option|get_item:i }}
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        {% endfor %}
+                                        <td>
+                                            {% if not opt.id %}
+                                            <div class="d-flex justify-content-end">
+                                                <a class="btn btn-sm btn-danger ms-3 new_options_delete"><i
+                                                        class="fe fe-trash" style="pointer-events: none;"></i></a>
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
                                     {% endfor %}
-                                </tr>
-                            </thead>
-                            {% if not object and not request_post %}
-                            <tbody id="options-tbody">
-                                <tr>
-                                    {% for lang in langs %}
-                                    <td>
-                                        <input class="form-control" type="text" name="option[{{ lang.code }}][1]">
-                                    </td>
+                                </tbody>
+                                {% elif object %}
+                                <tbody id="options-tbody">
+                                    {% for opt, i in options.pairs %}
+                                    <tr>
+                                        {% for lang in langs %}
+                                        <td>
+                                            <input class="form-control" type="text"
+                                                name="option[{{ lang.code }}][{{ i }}]" 
+                                                {% if opt.name|get_item:lang.code %} value="{{ opt.name|get_item:lang.code }}"
+                                                {% endif %}>
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
                                     {% endfor %}
-                                    <td>
-                                        <div class="d-flex justify-content-end del-opt-container">
-                                            <a class="btn btn-sm btn-danger ms-3 new_options_delete local"><i class="fe fe-trash" style="pointer-events: none;"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            {% elif request_post %}
-                            <tbody id="options-tbody">
-                                {% for opt, i in options_list.pairs %}
-                                <tr>
-                                    {% for lang in langs %}
-                                    <td>
-                                        <input class="form-control" type="text" name="option[{{ lang.code }}][{{ i }}]" 
-                                        {% if opt.name|get_item:lang.code %} value="{{ opt.name|get_item:lang.code }}" {% endif %}>
-                                        {% if lang.default and error_option|get_item:i %}
-                                        <div class="invalid-feedback" style="display: block;">
-                                            {{ error_option|get_item:i }}
-                                        </div>
-                                        {% endif %}
-                                    </td>
-                                    {% endfor %}
-                                    <td>
-                                        {% if not opt.id %}
-                                        <div class="d-flex justify-content-end">
-                                            <a class="btn btn-sm btn-danger ms-3 new_options_delete"><i class="fe fe-trash"
-                                                    style="pointer-events: none;"></i></a>
-                                        </div>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            {% elif object %}
-                            <tbody id="options-tbody">
-                                {% for opt, i in options.pairs %}
-                                <tr>
-                                    {% for lang in langs %}
-                                    <td>
-                                        <input class="form-control" type="text" name="option[{{ lang.code }}][{{ i }}]" 
-                                        {% if opt.name|get_item:lang.code %} value="{{ opt.name|get_item:lang.code }}" {% endif %}>
-                                    </td>
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            {% endif %}
-                        </table>
-                        <button id="add_item" type="button" class="btn btn-info w-100 my-4">Добавить еще</button>
+                                </tbody>
+                                {% endif %}
+                            </table>
+                            <button id="add_item" type="button" class="btn btn-info w-100 my-4">Добавить еще</button>
+                        </div>
                     </div>
                 </div>
-            </div>
                 <div class="btn-box text-end">
                     <a href="#" class="btn w-30 btn-secondary">
                         Отменить
@@ -163,12 +168,12 @@
 </form>
 <script>
     var inputs = document.querySelectorAll('input[name=options]');
-    for(let inp of inputs) {
+    for (let inp of inputs) {
         new Tagify(inp)
     }
 
     // initialize Tagify on the above input node reference
-        
+
 
     for (let txt of document.querySelectorAll('.editor')) {
         CKEDITOR.replace(txt)
@@ -185,7 +190,7 @@
             <tr>
                 {% for lang in langs %}
                 <td>
-                    <input class="form-control" type="text" name="option[{{ lang.code }}][${ curent_id }]">
+                    <input class="form-control" type="text" name="option[{{ lang.code }}][${curent_id}]">
                 </td>
                 {% endfor %}
                 <td>
