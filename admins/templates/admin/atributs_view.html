@@ -103,7 +103,7 @@
                                     <tr>
                                         {% for lang in langs %}
                                         <td>
-                                            <input class="form-control" type="text"
+                                            <input disabled class="form-control" type="text"
                                                 name="option[{{ lang.code }}][{{ i }}]" 
                                                 {% if opt.name|get_item:lang.code %} value="{{ opt.name|get_item:lang.code }}"
                                                 {% endif %}>
