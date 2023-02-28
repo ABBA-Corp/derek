@@ -91,12 +91,12 @@ if TEST_DOMEN:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': 'localhost',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'derek_db',
-            'USER': 'root',
+            'USER': 'postgres',
             'PASSWORD': '',
-            'PORT': '3306',
+            'HOST': 'localhost',
+            'PORT': '5432',
         }
     }
 
