@@ -1561,7 +1561,7 @@ class AtributEdit(UpdateView):
         options_count = request.POST.get("options_count", 0)
         old_count = self.get_object().options.count()
         lang = Languages.objects.filter(default=True).first()
-                                                                                                
+                                        
         try:
             options = collect_options(int(options_count), request)
         except:

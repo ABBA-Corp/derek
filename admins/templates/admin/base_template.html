@@ -30,7 +30,7 @@
     </style>
 
     <!-- Title -->
-    <title>{% block title %} {% endblock %}</title>
+    <title>{% block title %} Derek admin panel {% endblock %}</title>
 
     {% block css %} {% endblock %}
 
@@ -71,14 +71,6 @@
 
                 <!-- Navigation -->
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}" role="button" aria-expanded="false"
-                            aria-controls="sidebarDashboards">
-                            <i class="fe fe-home"></i> Dashboards
-                        </a>
-                    </li>
-
-                    <hr class="navbar-divider my-3">
                     <li class="nav-item">
                         <a class="nav-link " href="{% url 'short_aplic_list' %}">
                             <i class="fe fe-clipboard"></i> Заявки с сайта
