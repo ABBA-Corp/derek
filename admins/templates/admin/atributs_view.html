@@ -10,16 +10,16 @@
 
 {% block nav_ol %}
 <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'admins:home' %}">Главная</a></li>
     <li class="breadcrumb-item ">
-        <a href="{% url 'atr_list' %}">Атрибуты</a>
+        <a href="{% url 'admins:atr_list' %}">Атрибуты</a>
     </li>
     <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
         Создать
     </li>
     <li style="position: absolute;right: 20px;">
         <div class="btn-box text-end">
-            <a href="{% url 'atribut_edit' object.id %}" class="d-flex"
+            <a href="{% url 'admins:atribut_edit' object.id %}" class="d-flex"
                 style="width: max-content;text-decoration: underline;"><i
                     class="fe fe-edit-2 d-flex align-items-center justify-content-center"
                     style="width: 20px;height:20px"></i>
@@ -116,7 +116,7 @@
                                                 $(`input[name='options_count']`).val(Number($(`input[name='options_count']`).val()) - 1)
                                                 $('.delete_variant_btn.no-ajax').last().remove()
                                             }"><i class="fe fe-trash"></i></a>
-                                                <form action="{% url 'delete' %}" id="delete-form{{ opt.id }}"
+                                                <form action="{% url 'admins:delete' %}" id="delete-form{{ opt.id }}"
                                                     method="POST" style="display: none;">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="item_id" value="{{ opt.id }}">
@@ -134,7 +134,7 @@
                     </div>
                 </div>
                 <div class="btn-box text-end">
-                    <a href="{% url 'atribut_edit' object.id %}" class="d-flex p-1 mt-4"
+                    <a href="{% url 'admins:atribut_edit' object.id %}" class="d-flex p-1 mt-4"
                         style="width: max-content;text-decoration: underline;"><i
                             class="fe fe-edit-2 d-flex align-items-center justify-content-center" style="width: 20px;height:20px"></i>
                         редактировать</a>

@@ -52,7 +52,7 @@
             </button>
 
             <!-- Brand -->
-            <a class="navbar-brand" href="{% url 'home' %}">
+            <a class="navbar-brand" href="{% url 'admins:home' %}">
                 <img src="{% static 'assets/img/logo.svg' %}" class="navbar-brand-img mx-auto" alt="...">
             </a>
 
@@ -72,7 +72,7 @@
                 <!-- Navigation -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link " href="{% url 'short_aplic_list' %}">
+                        <a class="nav-link " href="{% url 'admins:short_aplic_list' %}">
                             <i class="fe fe-clipboard"></i> Заявки с сайта
                         </a>
                     </li>
@@ -85,7 +85,7 @@
                         <div class="collapse" id="sidebarPages">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
-                                    <a href="{% url 'articles_list' %}" class="nav-link" role="button"
+                                    <a href="{% url 'admins:articles_list' %}" class="nav-link" role="button"
                                         aria-expanded="false" aria-controls="sidebarPages">
                                         Посты
                                     </a>
@@ -106,24 +106,24 @@
                         <div class="collapse" id="sidebarCotalog">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
-                                    <a href="{% url 'category_list' %}" class="nav-link" role="button" aria-expanded="false"
+                                    <a href="{% url 'admins:category_list' %}" class="nav-link" role="button" aria-expanded="false"
                                         aria-controls="sidebarPages">
                                         Категории
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{% url 'products_list' %}" class="nav-link" role="button" aria-expanded="false" aria-controls="sidebarPages">
+                                    <a href="{% url 'admins:products_list' %}" class="nav-link" role="button" aria-expanded="false" aria-controls="sidebarPages">
                                         Продукты
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{% url 'color_list' %}" class="nav-link" role="button" aria-expanded="false"
+                                    <a href="{% url 'admins:color_list' %}" class="nav-link" role="button" aria-expanded="false"
                                         aria-controls="sidebarPages">
                                         Цвета
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{% url 'atr_list' %}" class="nav-link" role="button" aria-expanded="false" aria-controls="sidebarPages">
+                                    <a href="{% url 'admins:atr_list' %}" class="nav-link" role="button" aria-expanded="false" aria-controls="sidebarPages">
                                         Атрибуты
                                     </a>
                                 </li>
@@ -131,12 +131,12 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " href="{% url 'partners_list' %}">
+                        <a class="nav-link " href="{% url 'admins:partners_list' %}">
                             <i class="fe fe-book-open"></i> Партнеры
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " href="{% url 'review_list' %}">
+                        <a class="nav-link " href="{% url 'admins:review_list' %}">
                             <i class="fe fe-message-circle"></i> Отзывы
                         </a>
                     </li>
@@ -152,19 +152,19 @@
                         <div class="collapse" id="settingsPages">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
-                                    <a href="{% url 'static_info' %}" class="nav-link" role="button"
+                                    <a href="{% url 'admins:static_info' %}" class="nav-link" role="button"
                                         aria-expanded="false" aria-controls="sidebarAccount">
                                         Общие данные
                                     </a>
-                                    <a href="{% url 'langs_list' %}" class="nav-link" role="button"
+                                    <a href="{% url 'admins:langs_list' %}" class="nav-link" role="button"
                                         aria-expanded="false" aria-controls="sidebarAccount">
                                         Языки
                                     </a>
-                                    <a href="{% url 'translation_list' %}" class="nav-link" role="button"
+                                    <a href="{% url 'admins:translation_list' %}" class="nav-link" role="button"
                                         aria-expanded="false" aria-controls="sidebarAccount">
                                         Переводы
                                     </a>
-                                    <a href="{% url 'admin_list' %}" class="nav-link" role="button"
+                                    <a href="{% url 'admins:admin_list' %}" class="nav-link" role="button"
                                         aria-expanded="false" aria-controls="sidebarAccount">
                                         Админы
                                     </a>

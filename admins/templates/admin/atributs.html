@@ -14,7 +14,7 @@
     <!-- Navigation (button group) -->
 
     <!-- Buttons -->
-    <a href="{% url 'atr_create' %}" class="btn btn-primary ms-2">
+    <a href="{% url 'admins:atr_create' %}" class="btn btn-primary ms-2">
         Добавить
     </a>
 
@@ -23,7 +23,7 @@
 
 {% block nav_ol %}
 <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'admins:home' %}">Главная</a></li>
     <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
         Атрибуты
     </li>
@@ -79,7 +79,7 @@
                 {% for obj, i in objects.pairs %}
                 <tr>
                     <td>
-                        <a class="item-title" href="{% url 'atribut_edit' obj.id %}">{{ i }}</a>
+                        <a class="item-title" href="{% url 'admins:atribut_edit' obj.id %}">{{ i }}</a>
                     </td>
                     <td>
                         <p class="item-phone text-reset">
@@ -89,20 +89,20 @@
                     <td>
                         <ul>
                             {% for opt in obj.options.all %}
-                                <li class="atribut_options" data-id="{{ opt.id }}" data-get="{% url 'get_atr_option' %}" style="cursor: pointer;" data-bs-toggle="modal"
+                                <li class="atribut_options" data-id="{{ opt.id }}" data-get="{% url 'admins:get_atr_option' %}" style="cursor: pointer;" data-bs-toggle="modal"
                                 data-bs-target="#atributOptionModal">{{ opt.name|get_item:lang.code }}</li>
                             {% endfor %}
                         </ul>
                     </td>
                     <td>
                         <div class="d-flex justify-content-end">
-                            <a href="{% url 'atribut_detail' obj.id %}" class="btn btn-sm btn-primary"><i class="fe fe-info"></i></a>
-                            <a href="{% url 'atribut_edit' obj.id %}" class="btn btn-sm btn-info ms-3"><i
+                            <a href="{% url 'admins:atribut_detail' obj.id %}" class="btn btn-sm btn-primary"><i class="fe fe-info"></i></a>
+                            <a href="{% url 'admins:atribut_edit' obj.id %}" class="btn btn-sm btn-info ms-3"><i
                                     class="fe fe-edit-2"></i></a>
                             <a class="btn btn-sm btn-danger ms-3"
                                 onclick="var result = confirm('Want to delete?');if (result){form_submit_in_table('delete-form{{ obj.id }}')}"><i
                                     class="fe fe-trash"></i></a>
-                            <div action="{% url 'delete' %}" id="delete-form{{ obj.id }}" method="POST"
+                            <div action="{% url 'admins:delete' %}" id="delete-form{{ obj.id }}" method="POST"
                                 style="display: none;">
                                 {% csrf_token %}
                                 <input type="hidden" name="item_id" value="{{ obj.id }}">

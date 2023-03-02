@@ -17,9 +17,9 @@
 
 {% block nav_ol %}
 <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'admins:home' %}">Главная</a></li>
     <li class="breadcrumb-item ">
-        <a href="{% url 'products_list' %}">Продукты</a>
+        <a href="{% url 'admins:products_list' %}">Продукты</a>
     </li>
     <li class="breadcrumb-item active" aria-current="&quot;page&quot;">
         Просмотр
@@ -145,7 +145,7 @@
                 </div>
 
                 <div class="col-6">
-                    <a href="{% url 'products_edit' object.id %}" class="d-flex p-1 mt-4"
+                    <a href="{% url 'admins:products_edit' object.id %}" class="d-flex p-1 mt-4"
                         style="width: max-content;text-decoration: underline;"><i
                             class="fe fe-edit-2 d-flex align-items-center justify-content-center" style="width: 20px;height:20px"></i>
                         редактировать</a>
@@ -160,7 +160,7 @@
             <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10 mb-5" id="option[{{variant.id}}]">
                 <div class="blog_container">
                     <span class="delete_variant_btn"onclick="var result = confirm('Want to delete?');if (result){$('#delete-form{{ variant.id }}').submit()}">&#215;</span>
-                    <form action="{% url 'delete' %}" id="delete-form{{ variant.id }}" method="POST" style="display: none;">
+                    <form action="{% url 'admins:delete' %}" id="delete-form{{ variant.id }}" method="POST" style="display: none;">
                         {% csrf_token %}
                         <input type="hidden" name="item_id" value="{{ variant.id }}">
                         <input type="hidden" name="model_name_del" value="ProductVariants">

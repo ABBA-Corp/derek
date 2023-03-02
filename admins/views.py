@@ -291,7 +291,7 @@ class ArticleCreateView(BasedCreateView):
         except ValidationError:
             pass
 
-        return redirect('articles_list')  # redirect("")
+        return redirect('admins:articles_list')  # redirect("")
 
 
 # articles list
@@ -373,7 +373,7 @@ class ArticleUpdate(UpdateView):
         except ValidationError:
             pass
 
-        return redirect('articles_list')
+        return redirect('admins:articles_list')
 
 
 # langs list
@@ -413,7 +413,7 @@ class LngCreateView(CreateView):
     def form_valid(self, form):
         lang_save(form, self.request)
 
-        return redirect('langs_list')
+        return redirect('admins:langs_list')
 
     def get_context_data(self, **kwargs):
         context = super(LngCreateView, self).get_context_data(**kwargs)
@@ -445,7 +445,7 @@ class LangsUpdate(UpdateView):
     def form_valid(self, form):
         lang_save(form, self.request)
 
-        return redirect('langs_list')
+        return redirect('admins:langs_list')
 
 
 # langs delete
@@ -512,7 +512,7 @@ class StaticUpdate(UpdateView):
                 data['error_all'] = 'There is some errors'
                 return render(request, self.template_name, data)
 
-        return redirect('static_info')
+        return redirect('admins:static_info')
 
 
 def class_list():
@@ -739,7 +739,7 @@ class TranslationGroupUdpate(UpdateView):
             except:
                 return render(request, template_name=self.template_name, context={'key_errors': {str(i): 'Key is alredy in use'}, 'new_objects': objects, 'langs': langs, 'len': items_count})
 
-        return redirect('transl_group_detail', pk=self.get_object().id)
+        return redirect('admins:transl_group_detail', pk=self.get_object().id)
 
 
 # article ctg list
@@ -796,7 +796,7 @@ class AddArticleCtg(BasedCreateView):
             except:
                 pass
 
-        return redirect('article_ctg_list')
+        return redirect('admins:article_ctg_list')
 
 
 # article ctg edit
@@ -862,7 +862,7 @@ class ArticleCtgEdit(UpdateView):
                         pass
             instance.save()
 
-        return redirect('article_ctg_list')
+        return redirect('admins:article_ctg_list')
 
 # delete about us video
 
@@ -930,7 +930,7 @@ class AdminCreate(CreateView):
 
         new_user.save()
 
-        return redirect('admin_list')
+        return redirect('admins:admin_list')
 
 
 # admin udate
@@ -966,7 +966,7 @@ class AdminUpdate(UpdateView):
 
         user.save()
 
-        return redirect('admin_list')
+        return redirect('admins:admin_list')
 
 
 # del article image
@@ -1053,7 +1053,7 @@ class ReviewsCreate(BasedCreateView):
         except:
             pass
 
-        return redirect('review_list')
+        return redirect('admins:review_list')
 
 
 # reviews update
@@ -1117,7 +1117,7 @@ class ReviewsUpdate(UpdateView):
 
         instance.save()
 
-        return redirect("review_list")
+        return redirect("admins:review_list")
 
 
 # del review image
@@ -1136,7 +1136,7 @@ def delete_review_image(request):
 def logout_view(request):
     logout(request)
 
-    return redirect('login_admin')
+    return redirect('admins:login_admin')
 
 
 # partners
@@ -1181,7 +1181,7 @@ class PartnersCreate(BasedCreateView):
         except:
             pass
 
-        return redirect('partners_list')
+        return redirect('admins:partners_list')
 
 
 # pertners eidt
@@ -1236,7 +1236,7 @@ class PartnersEdit(UpdateView):
 
         instance.save()
 
-        return redirect("partners_list")
+        return redirect("admins:partners_list")
 
 
 # category list
@@ -1324,7 +1324,7 @@ class CategoryCreate(BasedCreateView):
             data['some_error'] = 'This field is required.'
             return render(request, self.template_name, data)
 
-        return redirect('category_list')
+        return redirect('admins:category_list')
 
 
 # category edit
@@ -1409,7 +1409,7 @@ class CategoryEdit(UpdateView):
 
         instance.save()
 
-        return redirect("category_list")
+        return redirect("admins:category_list")
 
 
 def del_category_file(request):
@@ -1513,7 +1513,7 @@ class AtributsCreate(BasedCreateView):
         except:
             pass
 
-        return redirect("atr_list")
+        return redirect("admins:atr_list")
 
 
 # atributs detail view
@@ -1627,7 +1627,7 @@ class AtributEdit(UpdateView):
             except:
                 pass
 
-        return redirect("atr_list")
+        return redirect("admins:atr_list")
 
 
 # get option
@@ -1716,7 +1716,7 @@ class ColorsCreate(BasedCreateView):
         except:
             pass
 
-        return redirect('color_list')
+        return redirect('admins:color_list')
 
 
 # color edit
@@ -1753,7 +1753,7 @@ class ColorEdit(UpdateView):
 
         instance.save()
 
-        return redirect("color_list")
+        return redirect("admins:color_list")
 
 
 # products list
@@ -1922,7 +1922,7 @@ class ProductsCreate(BasedCreateView):
         except:
             pass
 
-        return redirect("products_list")
+        return redirect("admins:products_list")
 
         
 
@@ -2009,7 +2009,7 @@ class ProductEdit(UpdateView):
             except:
                 pass
 
-        return redirect('products_detail', pk=self.get_object().pk)
+        return redirect('admins:products_detail', pk=self.get_object().pk)
 
 
 # class products detail view
