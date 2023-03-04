@@ -9,5 +9,5 @@ class LoginRequiredMiddleware(MiddlewareMixin):
         app_name = resolve(request.path).app_name
         
         if 'admins' == app_name and request.path != '/admin/login':
-            if not request.user.is_authenticated:
+            if not request.user.is_superuser:
                 return redirect('/admin/login')
