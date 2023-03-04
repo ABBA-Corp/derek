@@ -97,7 +97,7 @@
                     <td>
                         <div class="d-flex align-items-center">
                             <div class="avatar avatar-lg">
-                                {% if obj.image.path|is_file %}
+                                {% if obj.image obj.image.path|is_file %}
                                 <img class="avatar-img rounded-circle" src='{% image_thumb obj.image alias="ten" request=request %}' alt="...">
                                 {% else %}
                                 <img class="avatar-img rounded-circle" src="{% static 'src/img/default.png' %}"

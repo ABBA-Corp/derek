@@ -3,6 +3,7 @@
 {% load get_item %}
 {% load image_thumb %}
 {% load cut_text %}
+{% load is_file %}
 
 {% block title %} Заявки c сайта {% endblock %}
 
@@ -111,7 +112,7 @@
                             <div class="col-auto">
                                 <!-- Avatar -->
                                 <div class="avatar">
-                                    {% if object.product.image %}
+                                    {% if object.product.image and object.product.image.path|is_file %}
                                     <img class="avatar" src='{% image_thumb object.product.image alias="ten" request=request %}' alt="...">
                                     {% else %}
                                     <img class="avatar" src="{% static 'src/img/default.png' %}" alt="...">

@@ -93,7 +93,7 @@
                                 </div>
                                 <a class="dz-remove" data-file="" data-dz-remove>Удалить</a>
                             </div>
-                            {% if object.icon.path|is_file %}
+                            {% if object.icon and object.icon.path|is_file %}
                                 <div class="dz-preview dz-processing dz-complete dz-image-preview" style="position: relative;">
                                     <div class="dz-image">
                                         <img data-dz-thumbnail="" src='{% image_thumb object.image alias="ten" request=request %}' alt="{{ object.icon }}">

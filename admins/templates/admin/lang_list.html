@@ -111,7 +111,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if lang.icon.path|is_file %}
+                                            {% if lang.icon and lang.icon.path|is_file %}
                                             <!-- Phone -->
                                             <p class="item-phone text-reset">
                                                 <div class="avatar avatar-xs align-middle me-2">
