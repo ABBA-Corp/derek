@@ -73,7 +73,7 @@
                         <a class="list-sort text-muted" data-sort="item-name">Название</a>
                     </th>
                     <th>
-                        <a class="list-sort text-muted" data-sort="item-name">Описание</a>
+                        <a class="list-sort text-muted" data-sort="item-name">Изображение</a>
                     </th>
                     <th style="width: 200px;"></th>
                 </tr>
@@ -86,20 +86,17 @@
                     </td>
                     <td>
                         <p class="item-phone text-reset">
-                        <div class="avatar avatar-lg align-middle me-2">
-                            {% if obj.image and obj.image.path|is_file %}
-                            <img class="avatar-img rounded-circle" src='{% image_thumb obj.image alias="ten" request=request %}' alt="...">
-                            {% else %}
-                            <img class="avatar-img rounded-circle" src="{% static 'src/img/default.png' %}" alt="...">
-                            {% endif %}
-                        </div>
                         {{ obj.name|get_item:lang.code|cut_text }}
                         </p>
                     </td>
                     <td>
-                        <p class="item-text text-reset">
-                            {{ obj.deckription|get_item:lang.code|cut_text }}
-                        </p>
+                        <div class="avatar avatar align-middle me-2">
+                            {% if obj.image and obj.image.path|is_file %}
+                            <img class="avatar-img" src='{% image_thumb obj.image alias="ten" request=request %}' alt="...">
+                            {% else %}
+                            <img class="avatar-img" src="{% static 'src/img/default.png' %}" alt="...">
+                            {% endif %}
+                        </div>
                     </td>
                     <td>
                         <div class="d-flex justify-content-end">
