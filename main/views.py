@@ -90,7 +90,7 @@ class ProductsList(generics.ListAPIView):
 
 
     def get_queryset(self):
-        queryset = ProductVariants.objects.filter(default=True)
+        queryset = ProductVariants.objects.filter(product__active=True).filter(default=True)
         ctg_id = self.request.GET.get("category")
 
         try:
