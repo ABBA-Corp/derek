@@ -2,7 +2,7 @@
 {% load static %}
 {% load get_item %}
 {% load image_thumb %}
-
+{% load is_file %}
 
 {% block title %} Категории {% endblock %}
 
@@ -124,7 +124,7 @@
                     <br>
                     <!-- Input -->
                     <input type="file" name="cotalog" class="form-control" id="customFileUploadMultiple">
-                    {% if object and object.cotalog %}
+                    {% if object and object.cotalog.path|is_file %}
                     <div class="row">
                         <a class="d-block col-6" href="{{ object.cotalog.url }}">Скачать</a>
                         <a class="text-danger d-block col-6" style="cursor: pointer;" onclick="var result = confirm('Want to delete?');if (result){submit_form('delete-form-logo_sec')}"
@@ -168,7 +168,7 @@
                                             </div>
                                             <a class="dz-remove" data-file="" data-dz-remove>Удалить</a>
                                         </div>
-                                        {% if object.image %}
+                                        {% if object.image.path|is_file %}
                                         <div class="dz-preview dz-processing dz-complete dz-image-preview" style="position: relative;">
                                             <div class="dz-image">
                                                 <img data-dz-thumbnail="" src='{% image_thumb object.image alias="ten" request=request %}'
@@ -241,7 +241,7 @@
                                             </div>
                                             <a class="dz-remove" data-file="" data-dz-remove>Удалить</a>
                                         </div>
-                                        {% if object.icon %}
+                                        {% if object.icon.path|is_file %}
                                         <div class="dz-preview dz-processing dz-complete dz-image-preview" style="position: relative;">
                                             <div class="dz-image">
                                                 <img data-dz-thumbnail="" src="{{ object.icon.ten.url }}"

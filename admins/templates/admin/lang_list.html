@@ -1,6 +1,7 @@
 {% extends 'admin/base_template.html' %}
 {% load static %}
 {% load image_thumb %}
+{% load is_file %}
 
 {% block title %} Новый язык {% endblock %}
 
@@ -110,7 +111,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if lang.icon %}
+                                            {% if lang.icon.path|is_file %}
                                             <!-- Phone -->
                                             <p class="item-phone text-reset">
                                                 <div class="avatar avatar-xs align-middle me-2">

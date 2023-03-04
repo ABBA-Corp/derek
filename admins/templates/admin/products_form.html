@@ -3,6 +3,7 @@
 {% load get_item %}
 {% load range %}
 {% load str %}
+{% load is_file %}
 
 {% block css %} 
 <link rel="stylesheet" href="{% static 'assets/css/variants.css' %}">
@@ -328,7 +329,7 @@
                                             <div class="image_file">
                                                 <span class="img_text">Добавить изображение</span>
                                                 <input type="file" class="image_input" id="input" name="image[{{ i }}]" />
-                                                {% if variant.image %}
+                                                {% if variant.image.path|is_file %}
                                                 <div class="display-image"
                                                     style="background-image: url('{{ variant.image.url }}'); display:block;"></div>
                                                 {% else %}

@@ -3,6 +3,7 @@
 {% load get_item %}
 {% load cut_text %}
 {% load image_thumb %}
+{% load is_file %}
 
 
 {% block title %} Категории {% endblock %}
@@ -89,7 +90,7 @@
                     <td>
                         <p class="item-phone text-reset">
                         <div class="avatar avatar-lg align-middle me-2">
-                            {% if obj.image %}
+                            {% if obj.image.path|is_file %}
                             <img class="avatar-img rounded-circle" src='{% image_thumb obj.image alias="ten" request=request %}' alt="...">
                             {% else %}
                             <img class="avatar-img rounded-circle" src="{% static 'src/img/default.png' %}" alt="...">
