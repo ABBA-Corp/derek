@@ -124,7 +124,7 @@
                     <br>
                     <!-- Input -->
                     <input type="file" name="cotalog" class="form-control" id="customFileUploadMultiple">
-                    {% if object and object.cotalog.path|is_file %}
+                    {% if object and object.cotalog and object.cotalog.path|is_file %}
                     <div class="row">
                         <a class="d-block col-6" href="{{ object.cotalog.url }}">Скачать</a>
                         <a class="text-danger d-block col-6" style="cursor: pointer;" onclick="var result = confirm('Want to delete?');if (result){submit_form('delete-form-logo_sec')}"
