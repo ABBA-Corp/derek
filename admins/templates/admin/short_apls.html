@@ -2,7 +2,7 @@
 {% load static %}
 {% load get_item %}
 {% load cut_text %}
-
+{% load is_file %}
 
 {% block title %} Короткие Заявки {% endblock %}
 
@@ -74,7 +74,7 @@
                                         <div class="col-auto">
                                             <!-- Avatar -->
                                             <div class="avatar">
-                                                {% if obj.product.image %}
+                                                {% if obj.product.image and obj.product.image.path|is_file %}
                                                 <img class="avatar" src='{% image_thumb obj.product.image alias="ten" request=request %}'
                                                     alt="...">
                                                 {% else %}
