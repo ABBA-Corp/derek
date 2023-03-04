@@ -106,7 +106,7 @@
                     </td>
                     <td>
                         <div class="avatar align-middle me-2">
-                            {% if obj.icon %}
+                            {% if obj.icon.path|is_file %}
                             <img class="avatar-img rounded-circle" src='{% image_thumb obj.icon alias="ten" request=request %}' alt="...">
                             {% else %}
                             <img class="avatar-img rounded-circle" src="{% static 'src/img/default.png' %}" alt="...">
