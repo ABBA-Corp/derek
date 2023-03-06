@@ -146,7 +146,7 @@ class ColorSerializer(serializers.ModelSerializer):
 class Categoryserializer(serializers.ModelSerializer):
     name = JsonFieldSerializer()
     deckription = JsonFieldSerializer()
-    icon = ThumbnailSerializer(alias='ten')
+    icon = ThumbnailSerializer(alias='prod_photo')
     image = ThumbnailSerializer(alias='ten')
 
     class Meta:
