@@ -147,7 +147,7 @@ class Categoryserializer(serializers.ModelSerializer):
     name = JsonFieldSerializer()
     deckription = JsonFieldSerializer()
     icon = ThumbnailSerializer(alias='prod_photo')
-    image = ThumbnailSerializer(alias='ten')
+    image = ThumbnailSerializer(alias='prod_photo')
 
     class Meta:
         model = Category
