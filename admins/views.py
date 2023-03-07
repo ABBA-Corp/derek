@@ -2003,7 +2003,7 @@ class ProductEdit(UpdateView):
             options = var.pop('options')
             del var['i']
             try:
-                variant = ProductVariants.objects.create(**var)
+                variant = ProductVariants(**var)
                 variant.options.set(options)
                 variant.full_clean()
             except:
