@@ -353,7 +353,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class PartnersSerializer(serializers.ModelSerializer):
     name = JsonFieldSerializer()
     deckription = JsonFieldSerializer()
-    image = ThumbnailSerializer(alias='avatar')
+    image = ThumbnailSerializer(alias='ten')
 
     class Meta:
         model = Partners
