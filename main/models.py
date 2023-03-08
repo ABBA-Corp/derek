@@ -53,6 +53,7 @@ class Category(models.Model):
     image = ThumbnailerImageField(upload_to='ctg_image', blank=True, null=True)
     atributs = models.ManyToManyField(Atributs, blank=True, null=True)
     cotalog = models.FileField('Cotalog for download', upload_to='cotalog_fiels', blank=True, null=True)
+    active = models.BooleanField(default=True)
 
 
 
