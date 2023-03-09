@@ -18,15 +18,15 @@ class ThumbnailSerializer(serializers.BaseSerializer):
         if alias is None:
             return None
 
-        size = alias.get('size')[0]
+        size = alias.get('size')
         url = None
 
         if instance and default_storage.exists(instance.path):
             orig_url = instance.path.split('.')
-            thb_url = '.'.join(orig_url) + f'.{size}x{size}_q85.{orig_url[-1]}'
+            thb_url = '.'.join(orig_url) + f'.{size[0]}x{size[1]}_q85.{orig_url[-1]}'
             if default_storage.exists(thb_url):
                 last_url = instance.url.split('.')
-                url = '.'.join( last_url) + f'.{size}x{size}_q85.{last_url[-1]}'
+                url = '.'.join( last_url) + f'.{size[0]}x{size[1]}_q85.{last_url[-1]}'
             else:
                 url = get_thumbnailer(instance)[self.alias].url
 
