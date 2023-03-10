@@ -2006,6 +2006,7 @@ class ProductEdit(UpdateView):
                 variant = ProductVariants(**var)
                 variant.options.set(options)
                 variant.full_clean()
+                variant.save()
             except:
                 pass
 
