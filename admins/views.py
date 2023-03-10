@@ -2004,11 +2004,12 @@ class ProductEdit(UpdateView):
             del var['i']
             try:
                 variant = ProductVariants(**var)
-                variant.options.set(options)
                 variant.full_clean()
                 variant.save()
+                variant.options.set(options)
             except:
                 pass
+                
 
         return redirect('admins:products_detail', pk=self.get_object().pk)
 
