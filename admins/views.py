@@ -228,9 +228,13 @@ def delete_image(request):
     if request.method == 'POST':
         key = request.POST.get('key')
         file = request.POST.get("file")
+        
+
+        print(key)
 
         if request.session.get(key):
-            for it in request.session[key]:
+            for it in list(request.session[key]):
+                print(it['name'], file)
                 if it['name'] == file:
                     request.session[key].remove(it)
                     request.session.modified = True
