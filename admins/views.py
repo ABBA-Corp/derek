@@ -703,9 +703,8 @@ class TranslationGroupUdpate(UpdateView):
                 return render(request, template_name=self.template_name, context={'lng_errors': {str(i+1): 'This language is required'}, 'new_objects': objects, 'langs': langs, 'len': int(items_count) + 1})
 
             value_dict = {}
-            for lang in langs:
-                value_dict[str(lang.code)
-                           ] = request.POST[f'value[{i + 1}][{lang.code}]']
+            for lng in langs:
+                value_dict[str(lng.code)] = request.POST[f'value[{i + 1}][{lng.code}]']
 
             transls[i].value = value_dict
             try:
@@ -728,9 +727,9 @@ class TranslationGroupUdpate(UpdateView):
             if in_default_lng == '':
                 return render(request, template_name=self.template_name, context={'lng_errors': {str(i): 'This language is required'}, 'new_objects': objects, 'langs': langs, 'len': items_count})
 
-            for lang in langs:
-                value_dict[str(lang.code)
-                           ] = request.POST[f'value[{i}][{lang.code}]']
+            for lng in langs:
+                value_dict[str(lng.code)
+                           ] = request.POST[f'value[{i}][{lng.code}]']
 
             new_trans.value = value_dict
             new_trans.group = self.get_object()
