@@ -2,11 +2,12 @@ from django.template.defaulttags import register
 
 
 @register.filter
-def cut_text(str):
-    if str is not None:
-        if len(str) > 50:
-            return str[:50] + '...'
-        else:
-            return str
+def cut_text(strng):
+    if strng is None:
+        return '--'
 
-    return '--'
+    if len(str(strng)) > 50:
+        return strng[:50] + '...'
+    
+    return strng
+
